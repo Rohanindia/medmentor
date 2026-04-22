@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>MedMentor — AI Clinical Tutor</title>
+<link href="https://fonts.googleapis.com/css2?family=Tiempos+Text:ital,wght@0,400;0,500;1,400&family=Styrene+A:wght@400;500&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg: #f5f0e8;
+    --surface: #faf7f2;
+    --surface2: #f0ebe0;
+    --border: #e0d8cc;
+    --border2: #ccc4b4;
+    --accent: #c85c2a;
+    --accent2: #8b4513;
+    --green: #2d7a4f;
+    --amber: #b8860b;
+    --red: #c0392b;
+    --text: #1a1410;
+    --text2: #4a3f35;
+    --muted: #8a7a6a;
+    --user-bg: #2d2520;
+    --user-text: #f5f0e8;
+    --ai-bg: #faf7f2;
+    --font-serif: 'Crimson Pro', Georgia, serif;
+    --font-sans: 'DM Sans', system-ui, sans-serif;
+    --font-mono: 'DM Mono', monospace;
+    --sidebar-width: 280px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  
+  html, body { 
+    height: 100%; 
+    background: var(--bg); 
+    color: var(--text); 
+    font-family: var(--font-sans); 
+    font-size: 15px; 
+    line-height: 1.6;
+    overflow: hidden;
+  }
+
+  /* ── Layout ── */
+  .app { display: grid; grid-template-columns: var(--sidebar-width) 1fr; height: 100vh; }
+
+  /* ── Sidebar ── */
+  .sidebar {
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .sidebar-top {
+    padding: 20px 16px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .logo-mark {
+    width: 32px;
+    height: 32px;
+    background: var(--accent);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+
+  .logo-name {
+    font-family: var(--font-serif);
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: -0.3px;
+  }
+
+  .logo-name span { color: var(--accent); }
+
+  .new-chat-btn {
+    width: 100%;
+    padding: 9px 14px;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-family: var(--font-sans);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: background 0.2s;
+  }
+  .new-chat-btn:hover { background: var(--accent2); }
+
+  /* Patient Panel */
+  .sidebar-section {
+    padding: 14px 16px 10px;
+  }
+
+  .section-label {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+
+  .input-field {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 7px 10px;
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    outline: none;
+    transition: border-color 0.2s;
+    margin-bottom: 6px;
+  }
+  .input-field:focus { border-color: var(--accent); }
+  .input-field::placeholder { color: var(--muted); }
+
+  .select-field {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 7px 10px;
+    color: var(--text);
+    font-family: var(--font-sans);
+    font-size: 12px;
+    outline: none;
+    cursor: pointer;
+    margin-bottom: 8px;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%238a7a6a' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+  }
+
+  .load-btn {
+    width: 100%;
+    padding: 8px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    color: var(--text2);
+    font-family: var(--font-sans);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-bottom: 4px;
+  }
+  .load-btn:hover { background: var(--border); color: var(--text); }
+
+  /* Quick Tools */
+  .tools-list {
+    padding: 0 16px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .tool-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 10px;
+    border-radius: 7px;
+    cursor: pointer;
+    transition: background 0.15s;
+    font-size: 12.5px;
+    color: var(--text2);
+    border: none;
+    background: transparent;
+    text-align: left;
+    width: 100%;
+    font-family: var(--font-sans);
+  }
+  .tool-item:hover { background: var(--surface2); color: var(--text); }
+
+  .tool-icon {
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    flex-shrink: 0;
+  }
+
+  /* Sidebar Footer */
+  .sidebar-footer {
+    margin-top: auto;
+    padding: 12px 16px;
+    border-top: 1px solid var(--border);
+  }
+
+  .status-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--green);
+    animation: pulse 2s infinite;
+    flex-shrink: 0;
+  }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  /* ── Main Chat ── */
+  .chat-main {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background: var(--bg);
+  }
+
+  /* Top bar */
+  .topbar {
+    padding: 14px 28px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--surface);
+    flex-shrink: 0;
+  }
+
+  .topbar-title {
+    font-family: var(--font-serif);
+    font-size: 17px;
+    color: var(--text);
+    font-weight: 400;
+  }
+  .topbar-title em { color: var(--accent); }
+
+  .topbar-chips {
+    display: flex;
+    gap: 6px;
+  }
+
+  .chip {
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 500;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text2);
+  }
+  .chip.active { background: var(--accent); border-color: var(--accent); color: white; }
+
+  /* Messages */
+  .messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    scroll-behavior: smooth;
+  }
+  .messages::-webkit-scrollbar { width: 4px; }
+  .messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+  /* Welcome screen */
+  .welcome {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    min-height: 100%;
+    padding: 60px 40px;
+    text-align: center;
+    gap: 20px;
+  }
+
+  .welcome-symbol {
+    width: 56px;
+    height: 56px;
+    background: var(--accent);
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    margin-bottom: 4px;
+  }
+
+  .welcome h1 {
+    font-family: var(--font-serif);
+    font-size: 28px;
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: -0.5px;
+  }
+
+  .welcome p {
+    color: var(--muted);
+    font-size: 15px;
+    max-width: 440px;
+    line-height: 1.7;
+  }
+
+  .suggestion-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 8px;
+    width: 100%;
+    max-width: 520px;
+  }
+
+  .suggestion {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 14px;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.15s;
+    font-family: var(--font-sans);
+    color: var(--text2);
+  }
+  .suggestion:hover {
+    border-color: var(--accent);
+    color: var(--text);
+    background: var(--surface2);
+    transform: translateY(-1px);
+  }
+  .suggestion-icon { font-size: 18px; display: block; margin-bottom: 6px; }
+  .suggestion-text { font-size: 13px; line-height: 1.4; }
+
+  /* Message rows */
+  .msg-row {
+    padding: 20px 0;
+    animation: fadeUp 0.25s ease;
+    border-bottom: 1px solid var(--border);
+  }
+  .msg-row:last-child { border-bottom: none; }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+
+  .msg-row.user { background: var(--user-bg); }
+  .msg-row.ai { background: var(--surface); }
+
+  .msg-inner {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 0 28px;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+  }
+
+  .avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .avatar.user { background: #5a4a3a; }
+  .avatar.ai { background: var(--accent); }
+
+  .msg-content {
+    flex: 1;
+    font-size: 14.5px;
+    line-height: 1.75;
+  }
+
+  .msg-content.user-text { color: #e8ddd0; font-size: 14.5px; }
+  .msg-content.ai-text { color: var(--text); }
+
+  .msg-content strong { color: var(--accent2); font-weight: 600; }
+  .msg-content em { color: var(--accent); }
+
+  .msg-sender {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .msg-row.user .msg-sender { color: #8a7a6a; }
+  .msg-row.ai .msg-sender { color: var(--muted); }
+
+  /* Typing */
+  .typing-dots {
+    display: flex;
+    gap: 4px;
+    padding: 4px 0;
+  }
+  .typing-dots span {
+    width: 6px; height: 6px;
+    background: var(--muted);
+    border-radius: 50%;
+    animation: bounce 1.2s infinite;
+  }
+  .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+  .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes bounce { 0%,80%,100%{transform:translateY(0)} 40%{transform:translateY(-6px);background:var(--accent)} }
+
+  /* Tool indicator */
+  .tool-call {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 10px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 11.5px;
+    color: var(--muted);
+    font-family: var(--font-mono);
+    animation: shimmer 1.5s infinite;
+    margin-bottom: 8px;
+  }
+  @keyframes shimmer { 0%,100%{opacity:1} 50%{opacity:0.5} }
+
+  /* Input area */
+  .input-area {
+    padding: 16px 28px 20px;
+    border-top: 1px solid var(--border);
+    background: var(--surface);
+    flex-shrink: 0;
+  }
+
+  .input-box {
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  .input-wrap {
+    display: flex;
+    gap: 8px;
+    align-items: flex-end;
+    background: var(--bg);
+    border: 1.5px solid var(--border2);
+    border-radius: 12px;
+    padding: 10px 12px;
+    transition: border-color 0.2s;
+  }
+  .input-wrap:focus-within { border-color: var(--accent); }
+
+  #msgInput {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--text);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    resize: none;
+    max-height: 120px;
+    min-height: 22px;
+    line-height: 1.5;
+  }
+  #msgInput::placeholder { color: var(--muted); }
+
+  .send-btn {
+    width: 32px; height: 32px;
+    background: var(--accent);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+  .send-btn:hover { background: var(--accent2); }
+  .send-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+  .send-btn svg { width: 15px; height: 15px; fill: white; }
+
+  .input-hint {
+    text-align: center;
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 8px;
+  }
+  .input-hint kbd {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 1px 5px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+  }
+
+  /* Tool result formatting */
+  .tool-result {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    color: var(--text2);
+    line-height: 1.7;
+    margin-bottom: 4px;
+  }
+  .tool-result .warn { color: var(--red); font-weight: 500; }
+  .tool-result .ok { color: var(--green); }
+  .tool-result .label { color: var(--accent2); font-weight: 500; }
+
+  /* Divider in sidebar */
+  .sidebar-divider {
+    height: 1px;
+    background: var(--border);
+    margin: 4px 16px;
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ── Sidebar ── -->
+  <aside class="sidebar">
+    <div class="sidebar-top">
+      <div class="logo">
+        <div class="logo-mark">🩺</div>
+        <div class="logo-name">Med<span>Mentor</span></div>
+      </div>
+      <button class="new-chat-btn" onclick="clearChat()">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        New session
+      </button>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="section-label">Patient</div>
+      <input class="input-field" id="patientId" placeholder="Patient ID (e.g. 592905)" value="592905"/>
+      <select class="select-field" id="difficulty">
+        <option value="beginner">Beginner</option>
+        <option value="intermediate" selected>Intermediate</option>
+        <option value="advanced">Advanced</option>
+      </select>
+      <button class="load-btn" onclick="loadPatient()">Load Patient Case</button>
+    </div>
+
+    <div class="sidebar-divider"></div>
+
+    <div class="sidebar-section" style="padding-bottom:6px">
+      <div class="section-label">Quick Tools</div>
+    </div>
+    <div class="tools-list">
+      <button class="tool-item" onclick="quickTool('get_patient_case')">
+        <div class="tool-icon" style="background:#fde8dc">📋</div>
+        Patient Case
+      </button>
+      <button class="tool-item" onclick="quickTool('get_lab_results')">
+        <div class="tool-icon" style="background:#dceffe">🔬</div>
+        Lab Results
+      </button>
+      <button class="tool-item" onclick="quickTool('get_drug_interactions')">
+        <div class="tool-icon" style="background:#fef3dc">💊</div>
+        Drug Interactions
+      </button>
+      <button class="tool-item" onclick="quickTool('get_clinical_question')">
+        <div class="tool-icon" style="background:#dcfee8">❓</div>
+        Generate Question
+      </button>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="status-row">
+        <div class="dot"></div>
+        <span>Groq AI · FHIR R4 · RxNorm</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ── Main ── -->
+  <main class="chat-main">
+    <div class="topbar">
+      <div class="topbar-title"><em>Clinical Reasoning</em> Session</div>
+      <div class="topbar-chips">
+        <span class="chip active">MCP</span>
+        <span class="chip">FHIR</span>
+        <span class="chip">Groq AI</span>
+      </div>
+    </div>
+
+    <div class="messages" id="messages">
+      <div class="welcome" id="welcome">
+        <div class="welcome-symbol">🧠</div>
+        <h1>How can I help you learn today?</h1>
+        <p>Ask me anything about medicine, load a patient case, or check if medications are safe together.</p>
+        <div class="suggestion-grid">
+          <button class="suggestion" onclick="sendQuick('Load a patient case and give me the clinical summary')">
+            <span class="suggestion-icon">📋</span>
+            <span class="suggestion-text">Load a patient case</span>
+          </button>
+          <button class="suggestion" onclick="sendQuick('What are the lab results for this patient?')">
+            <span class="suggestion-icon">🔬</span>
+            <span class="suggestion-text">View lab results</span>
+          </button>
+          <button class="suggestion" onclick="sendQuick('Check drug interactions for warfarin and ibuprofen')">
+            <span class="suggestion-icon">💊</span>
+            <span class="suggestion-text">Check drug safety</span>
+          </button>
+          <button class="suggestion" onclick="sendQuick('Give me a clinical reasoning question')">
+            <span class="suggestion-icon">❓</span>
+            <span class="suggestion-text">Quiz me on this case</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="input-area">
+      <div class="input-box">
+        <div class="input-wrap">
+          <textarea id="msgInput" rows="1"
+            placeholder="Ask anything about medicine..."
+            onkeydown="handleKey(event)"
+            oninput="autoResize(this)"></textarea>
+          <button class="send-btn" id="sendBtn" onclick="sendMessage()">
+            <svg viewBox="0 0 24 24"><path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/></svg>
+          </button>
+        </div>
+        <div class="input-hint"><kbd>Enter</kbd> to send · <kbd>Shift+Enter</kbd> new line · Powered by Groq AI</div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+const state = {
+  patientId: '592905',
+  difficulty: 'intermediate',
+  history: [],
+  loading: false,
+  patientSummary: null
+};
+
+// ── API Calls ──────────────────────────────────────────────────
+async function askAI(message) {
+  try {
+    const res = await fetch('http://localhost:8000/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        message,
+        patient_context: state.patientSummary || '',
+        history: state.history.slice(-10),
+        difficulty: state.difficulty
+      }),
+      signal: AbortSignal.timeout(30000)
+    });
+    if (res.ok) return (await res.json()).response;
+  } catch(e) {}
+  return 'Please make sure bridge.py is running on port 8000.';
+}
+
+async function callTool(toolName, args) {
+  try {
+    const res = await fetch('http://localhost:8000/tool', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ tool: toolName, arguments: args }),
+      signal: AbortSignal.timeout(12000)
+    });
+    if (res.ok) return (await res.json()).result;
+  } catch(e) {}
+  return simulateTool(toolName);
+}
+
+// ── Message Router ─────────────────────────────────────────────
+async function runTutor(userMsg) {
+  const l = userMsg.toLowerCase();
+  let toolResult = null;
+  let toolName = null;
+
+  if (l.includes('load') || l.includes('patient case') || l.includes('summary')) {
+    toolName = 'get_patient_case';
+    showToolCall(toolName);
+    toolResult = await callTool(toolName, { patient_id: state.patientId });
+    state.patientSummary = toolResult;
+  } else if (l.includes('lab') || l.includes('blood test') || l.includes('result')) {
+    toolName = 'get_lab_results';
+    showToolCall(toolName);
+    toolResult = await callTool(toolName, { patient_id: state.patientId });
+  } else if (l.includes('drug') || l.includes('interaction') || l.includes('safe')) {
+    const stop = new Set(['check','drug','interactions','interaction','medication','between','and','for','the','is','safe','please','what','are','about']);
+    const drugs = userMsg.toLowerCase().split(/\s+/).filter(w => w.length > 3 && !stop.has(w));
+    toolName = 'get_drug_interactions';
+    showToolCall(toolName);
+    toolResult = await callTool(toolName, { drug_one: drugs[0]||'warfarin', drug_two: drugs[1]||'ibuprofen' });
+  } else if (l.includes('question') || l.includes('quiz') || l.includes('test me')) {
+    toolName = 'get_clinical_question';
+    showToolCall(toolName);
+    toolResult = await callTool(toolName, {
+      patient_summary: state.patientSummary || 'Patient with T2DM, Hypertension, CKD.',
+      difficulty: state.difficulty
+    });
+  }
+
+  await sleep(300);
+  removeToolCall();
+
+  if (toolResult) {
+    const formatted = formatTool(toolResult);
+    setTimeout(async () => {
+      addTyping();
+      const explanation = await askAI(`Tool returned:\n${toolResult}\n\nExplain this to the student simply and ask one follow-up question.`);
+      removeTyping();
+      addMsg('ai', explanation, false);
+      state.history.push({ role: 'ai', content: explanation });
+    }, 600);
+    return { html: formatted, isToolResult: true };
+  }
+
+  const reply = await askAI(userMsg);
+  return { text: reply, isToolResult: false };
+}
+
+// ── UI Helpers ─────────────────────────────────────────────────
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+function hideWelcome() { const w = document.getElementById('welcome'); if(w) w.remove(); }
+function now() { return new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}); }
+
+function addMsg(role, content, isHTML = false) {
+  const msgs = document.getElementById('messages');
+  const row = document.createElement('div');
+  row.className = `msg-row ${role}`;
+
+  const senderLabel = role === 'ai' ? 'MedMentor' : 'You';
+  const avatarEmoji = role === 'ai' ? '🩺' : '👤';
+  const contentClass = role === 'ai' ? 'ai-text' : 'user-text';
+
+  const displayContent = isHTML ? content : escHtml(content);
+
+  row.innerHTML = `
+    <div class="msg-inner">
+      <div class="avatar ${role}">${avatarEmoji}</div>
+      <div style="flex:1;min-width:0">
+        <div class="msg-sender">${senderLabel} · ${now()}</div>
+        <div class="msg-content ${contentClass}">${displayContent}</div>
+      </div>
+    </div>`;
+  msgs.appendChild(row);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function addTyping() {
+  const msgs = document.getElementById('messages');
+  const row = document.createElement('div');
+  row.className = 'msg-row ai'; row.id = 'typing';
+  row.innerHTML = `<div class="msg-inner">
+    <div class="avatar ai">🩺</div>
+    <div><div class="msg-sender">MedMentor</div><div class="typing-dots"><span></span><span></span><span></span></div></div>
+  </div>`;
+  msgs.appendChild(row);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+function removeTyping() { const t = document.getElementById('typing'); if(t) t.remove(); }
+
+function showToolCall(name) {
+  const msgs = document.getElementById('messages');
+  const d = document.createElement('div');
+  d.className = 'msg-row ai'; d.id = 'toolcall';
+  d.innerHTML = `<div class="msg-inner"><div class="avatar ai">🩺</div><div><div class="tool-call">⚙ Calling ${name}...</div></div></div>`;
+  msgs.appendChild(d);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+function removeToolCall() { const t = document.getElementById('toolcall'); if(t) t.remove(); }
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function formatTool(raw) {
+  const lines = raw.split('\n');
+  let html = '<div class="tool-result">';
+  for (const line of lines) {
+    if (line.startsWith('**') && line.endsWith('**')) {
+      html += `<div class="label">${line.replace(/\*\*/g,'')}</div>`;
+    } else if (line.includes('⚠️') || line.includes('[HIGH]') || line.includes('[MODERATE]')) {
+      html += `<div class="warn">${escHtml(line)}</div>`;
+    } else if (line.startsWith('  •')) {
+      html += `<div>${escHtml(line)}</div>`;
+    } else if (line.startsWith('❓')) {
+      html += `</div><div style="margin-top:8px;font-family:var(--font-sans);font-size:14px;color:var(--text)">${escHtml(line)}</div>`;
+    } else if (line.trim()) {
+      html += `<div>${escHtml(line)}</div>`;
+    }
+  }
+  html += '</div>';
+  return html;
+}
+
+function autoResize(el) { el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,120)+'px'; }
+
+// ── Send ───────────────────────────────────────────────────────
+async function sendMessage() {
+  const input = document.getElementById('msgInput');
+  const msg = input.value.trim();
+  if (!msg || state.loading) return;
+  hideWelcome();
+  state.loading = true;
+  document.getElementById('sendBtn').disabled = true;
+  input.value = ''; input.style.height = 'auto';
+
+  addMsg('user', msg);
+  addTyping();
+
+  try {
+    const { text, html, isToolResult } = await runTutor(msg);
+    removeTyping();
+    if (isToolResult) {
+      addMsg('ai', html, true);
+    } else {
+      addMsg('ai', text ? escHtml(text).replace(/\n/g,'<br>') : '...', true);
+    }
+    state.history.push({ role: 'user', content: msg });
+  } catch(e) {
+    removeTyping();
+    addMsg('ai', '⚠️ Something went wrong. Is bridge.py running?');
+  }
+
+  state.loading = false;
+  document.getElementById('sendBtn').disabled = false;
+  document.getElementById('msgInput').focus();
+}
+
+function sendQuick(msg) {
+  document.getElementById('msgInput').value = msg;
+  sendMessage();
+}
+
+function handleKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+}
+
+async function loadPatient() {
+  state.patientId = document.getElementById('patientId').value.trim() || '592905';
+  state.difficulty = document.getElementById('difficulty').value;
+  hideWelcome();
+  addMsg('user', `Load patient: ${state.patientId} (${state.difficulty})`);
+  addTyping(); showToolCall('get_patient_case');
+  await sleep(400); removeToolCall();
+  const result = await callTool('get_patient_case', { patient_id: state.patientId });
+  state.patientSummary = result;
+  removeTyping();
+  addMsg('ai', formatTool(result), true);
+  setTimeout(async () => {
+    addTyping();
+    const explain = await askAI(`Patient loaded: ${result}\n\nGreet the student warmly, summarize this patient simply, ask what to investigate first.`);
+    removeTyping();
+    addMsg('ai', escHtml(explain).replace(/\n/g,'<br>'), true);
+  }, 600);
+}
+
+function quickTool(tool) {
+  const p = {
+    get_patient_case: 'Load a patient case and give me the clinical summary',
+    get_lab_results: 'What are the lab results for this patient?',
+    get_drug_interactions: 'Check drug interactions for warfarin and ibuprofen',
+    get_clinical_question: 'Give me a clinical reasoning question to test my knowledge'
+  };
+  sendQuick(p[tool]);
+}
+
+function clearChat() {
+  state.history = []; state.patientSummary = null;
+  document.getElementById('messages').innerHTML = `
+  <div class="welcome" id="welcome">
+    <div class="welcome-symbol">🧠</div>
+    <h1>How can I help you learn today?</h1>
+    <p>Ask me anything about medicine, load a patient case, or check if medications are safe together.</p>
+    <div class="suggestion-grid">
+      <button class="suggestion" onclick="sendQuick('Load a patient case and give me the clinical summary')"><span class="suggestion-icon">📋</span><span class="suggestion-text">Load a patient case</span></button>
+      <button class="suggestion" onclick="sendQuick('What are the lab results for this patient?')"><span class="suggestion-icon">🔬</span><span class="suggestion-text">View lab results</span></button>
+      <button class="suggestion" onclick="sendQuick('Check drug interactions for warfarin and ibuprofen')"><span class="suggestion-icon">💊</span><span class="suggestion-text">Check drug safety</span></button>
+      <button class="suggestion" onclick="sendQuick('Give me a clinical reasoning question')"><span class="suggestion-icon">❓</span><span class="suggestion-text">Quiz me on this case</span></button>
+    </div>
+  </div>`;
+}
+
+function simulateTool(n) {
+  if (n==='get_patient_case') return "**Patient Case**\nName: John Smith\nGender: male\nDOB: 1957-04-15\n\n**Active Conditions** (3):\n  • Type 2 Diabetes Mellitus\n  • Hypertension\n  • Chronic Kidney Disease Stage 3\n\n**Medications** (4):\n  • Metformin 500mg\n  • Lisinopril 10mg\n  • Warfarin 5mg\n  • Furosemide 40mg";
+  if (n==='get_lab_results') return "**Lab Results**\n\n  • HbA1c: 8.2 %  [2024-11-01]\n  • Serum Creatinine: 2.1 mg/dL  [2024-11-01]\n  • eGFR: 38 mL/min/1.73m²  [2024-11-01]\n  • Blood Pressure: 148/92 mmHg  [2024-11-01]\n  • INR: 2.8  [2024-11-01]";
+  if (n==='get_drug_interactions') return "**Drug Interactions**\n\n  ⚠️  [HIGH] Warfarin + Ibuprofen: increased bleeding risk.\n  ⚠️  [MODERATE] Ibuprofen worsens renal function in CKD.";
+  if (n==='get_clinical_question') return "**Clinical Reasoning Question**\n\n❓ Given CKD Stage 3 and INR 2.8, how would you adjust anticoagulation therapy?\n\n_Consider renal clearance, bleeding risk, and therapeutic targets._";
+  return 'Tool unavailable.';
+}
+</script>
+</body>
+</html>
