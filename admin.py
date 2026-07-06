@@ -17,7 +17,8 @@ from datetime import datetime, timedelta, timezone
 # ── Config ────────────────────────────────────────────────────────────────────
 ADMIN_USERNAME      = "Rohan"
 ADMIN_PASSWORD      = "HareKrishna"
-ADMIN_SECRET_KEY    = os.environ.get("ADMIN_JWT_SECRET", "medmentor-admin-secret-2026")
+ADMIN_SECRET_KEY    = os.environ.get("ADMIN_JWT_SECRET", "medmentor_super_secret_key_2026!!")
+SECRET_KEY          = ADMIN_SECRET_KEY
 ADMIN_TOKEN_EXPIRY  = 12   # hours
 DB_PATH             = "medmentor.db"
 

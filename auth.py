@@ -14,7 +14,7 @@ from datetime import datetime, timedelta
 from pathlib import Path
 
 # ── Config ────────────────────────────────────────────────────────────────────
-SECRET_KEY = os.environ.get("JWT_SECRET", "medmentor-secret-key-2026")
+SECRET_KEY = os.environ.get("JWT_SECRET", "medmentor_super_secret_key_2026!!")
 DB_PATH    = "medmentor.db"
 TOKEN_EXPIRY_HOURS = 24
 
