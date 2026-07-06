@@ -34,11 +34,11 @@
 
         html,
         body {
-            height: 100%;
+            min-height: 100%;
             font-family: 'Outfit', sans-serif;
             background: var(--bg);
             color: var(--text);
-            overflow: hidden;
+            overflow-y: auto;
         }
 
         body::before {
@@ -65,7 +65,7 @@
             align-items: center;
             justify-content: center;
             min-height: 100vh;
-            padding: 20px;
+            padding: 24px 16px;
         }
 
         .card {
@@ -74,12 +74,13 @@
             background: var(--surface);
             border: 1px solid var(--border2);
             border-radius: 20px;
-            overflow: hidden;
             box-shadow: 0 25px 80px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
         }
 
         .card-header {
-            padding: 32px 36px 24px;
+            padding: 28px 28px 20px;
             text-align: center;
             border-bottom: 1px solid var(--border);
         }
@@ -88,7 +89,7 @@
             display: inline-flex;
             align-items: center;
             gap: 10px;
-            margin-bottom: 16px;
+            margin-bottom: 12px;
         }
 
         .logo-icon {
@@ -115,15 +116,16 @@
 
         .card-title {
             font-family: 'Syne', sans-serif;
-            font-size: 20px;
+            font-size: 19px;
             font-weight: 600;
             color: var(--text);
-            margin-bottom: 6px;
+            margin-bottom: 4px;
         }
 
         .card-subtitle {
-            font-size: 13px;
+            font-size: 12.5px;
             color: var(--text2);
+            line-height: 1.4;
         }
 
         .tabs {
@@ -131,7 +133,7 @@
             background: var(--surface2);
             border-radius: 10px;
             padding: 4px;
-            margin: 0 36px 0;
+            margin: 0 28px 0;
             gap: 4px;
         }
 
@@ -156,13 +158,13 @@
         }
 
         .card-body {
-            padding: 24px 36px 32px;
+            padding: 20px 28px 24px;
         }
 
         .form {
             display: none;
             flex-direction: column;
-            gap: 14px;
+            gap: 12px;
         }
 
         .form.active {
@@ -386,19 +388,80 @@
             background: var(--surface2);
             border: 1px solid var(--border);
             border-radius: 8px;
-            padding: 10px 12px;
-            font-size: 11px;
-            color: var(--text3);
+            padding: 8px 12px;
+            font-size: 10.5px;
+            color: var(--text2);
             font-family: 'DM Mono', monospace;
-            line-height: 1.8;
+            line-height: 1.5;
         }
 
         .examples strong {
             color: var(--accent);
-            display: block;
-            margin-bottom: 4px;
-            font-size: 10px;
+            display: inline-block;
+            margin-bottom: 2px;
+            font-size: 9.5px;
             letter-spacing: 0.5px;
+        }
+
+        /* Mobile Responsive Adjustments */
+        @media (max-width: 480px) {
+            .container {
+                padding: 12px 10px;
+            }
+            .card {
+                border-radius: 16px;
+                box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+            }
+            .card-header {
+                padding: 24px 20px 16px;
+            }
+            .logo {
+                margin-bottom: 8px;
+            }
+            .logo-icon {
+                width: 36px;
+                height: 36px;
+                font-size: 18px;
+            }
+            .logo-text {
+                font-size: 20px;
+            }
+            .card-title {
+                font-size: 17px;
+            }
+            .card-subtitle {
+                font-size: 12px;
+            }
+            .tabs {
+                margin: 0 20px 0;
+            }
+            .card-body {
+                padding: 16px 20px 20px;
+                gap: 10px;
+            }
+            .form {
+                gap: 10px;
+            }
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            .input {
+                padding: 8px 11px;
+                font-size: 12.5px;
+            }
+            .examples {
+                padding: 8px 10px;
+                font-size: 10px;
+                line-height: 1.4;
+            }
+            .btn-submit {
+                padding: 10px;
+                font-size: 13.5px;
+            }
+            .card-footer {
+                padding: 0 20px 20px;
+            }
         }
     </style>
 </head>
