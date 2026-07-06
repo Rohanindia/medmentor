@@ -1,0 +1,1618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MedMentor Admin Dashboard</title>
+  <meta name="description" content="MedMentor Admin Panel — manage students, view statistics, and oversee platform activity." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+  <style>
+    /* ── Reset & Base ─────────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg-deep    : #060810;
+      --bg-dark    : #0a0d16;
+      --bg-card    : #0f1422;
+      --bg-elevated: #141929;
+      --bg-hover   : #1a2035;
+      --accent     : #4f8ef7;
+      --accent-dim : #3a72d4;
+      --accent-glow: rgba(79,142,247,.18);
+      --success    : #22c55e;
+      --success-dim: #16a34a;
+      --danger     : #ef4444;
+      --danger-dim : #dc2626;
+      --warning    : #f59e0b;
+      --text-1     : #f0f4ff;
+      --text-2     : #8b9cc8;
+      --text-3     : #5a6a8a;
+      --border     : rgba(79,142,247,.12);
+      --border-bright: rgba(79,142,247,.3);
+      --radius-sm  : 8px;
+      --radius-md  : 14px;
+      --radius-lg  : 20px;
+      --sidebar-w  : 260px;
+      --topbar-h   : 64px;
+      --transition : .22s cubic-bezier(.4,0,.2,1);
+    }
+
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg-deep);
+      color: var(--text-1);
+      min-height: 100vh;
+      overflow-x: hidden;
+      line-height: 1.6;
+    }
+
+    /* ── Scrollbar ─────────────────────────────────────────────────────────── */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg-dark); }
+    ::-webkit-scrollbar-thumb { background: var(--border-bright); border-radius: 99px; }
+
+    /* ════════════════════════════════════════════════════════════════════════
+       LOGIN SCREEN
+    ════════════════════════════════════════════════════════════════════════ */
+    #login-screen {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background:
+        radial-gradient(ellipse 80% 60% at 50% -10%, rgba(79,142,247,.15) 0%, transparent 70%),
+        var(--bg-deep);
+      padding: 20px;
+    }
+
+    .login-wrap {
+      width: 100%;
+      max-width: 440px;
+      animation: slideUp .5s ease forwards;
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .login-logo {
+      text-align: center;
+      margin-bottom: 36px;
+    }
+    .login-logo .logo-icon {
+      width: 68px; height: 68px;
+      background: linear-gradient(135deg, var(--accent), #7c3aed);
+      border-radius: 20px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      margin-bottom: 16px;
+      box-shadow: 0 0 40px rgba(79,142,247,.35);
+    }
+    .login-logo h1 { font-size: 26px; font-weight: 800; letter-spacing: -.5px; }
+    .login-logo h1 span { color: var(--accent); }
+    .login-logo p { color: var(--text-2); font-size: 14px; margin-top: 4px; }
+
+    .login-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-bright);
+      border-radius: var(--radius-lg);
+      padding: 36px;
+      box-shadow: 0 24px 80px rgba(0,0,0,.5), 0 0 0 1px rgba(79,142,247,.05);
+    }
+
+    .login-card h2 {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .login-card p.sub {
+      color: var(--text-2);
+      font-size: 14px;
+      margin-bottom: 28px;
+    }
+
+    .form-group { margin-bottom: 20px; }
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-2);
+      margin-bottom: 8px;
+      letter-spacing: .3px;
+      text-transform: uppercase;
+    }
+    .input-wrap { position: relative; }
+    .input-wrap i {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-3);
+      font-size: 15px;
+      pointer-events: none;
+    }
+    .form-group input {
+      width: 100%;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 13px 14px 13px 42px;
+      color: var(--text-1);
+      font-family: inherit;
+      font-size: 15px;
+      transition: border-color var(--transition), box-shadow var(--transition);
+      outline: none;
+    }
+    .form-group input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+    .form-group input::placeholder { color: var(--text-3); }
+
+    .btn-login {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, var(--accent), #7c3aed);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-family: inherit;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity var(--transition), transform var(--transition), box-shadow var(--transition);
+      box-shadow: 0 8px 24px rgba(79,142,247,.3);
+      margin-top: 8px;
+      letter-spacing: .3px;
+      position: relative;
+      overflow: hidden;
+    }
+    .btn-login::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,.12), transparent);
+      opacity: 0;
+      transition: opacity var(--transition);
+    }
+    .btn-login:hover { transform: translateY(-1px); box-shadow: 0 12px 32px rgba(79,142,247,.45); }
+    .btn-login:hover::after { opacity: 1; }
+    .btn-login:active { transform: translateY(0); }
+
+    .login-err {
+      margin-top: 14px;
+      padding: 10px 14px;
+      background: rgba(239,68,68,.1);
+      border: 1px solid rgba(239,68,68,.3);
+      border-radius: var(--radius-sm);
+      color: #fca5a5;
+      font-size: 13px;
+      display: none;
+    }
+    .login-err.show { display: block; animation: shake .3s ease; }
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      25%      { transform: translateX(-6px); }
+      75%      { transform: translateX(6px); }
+    }
+
+    .login-badge {
+      margin-top: 20px;
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-3);
+    }
+    .login-badge i { color: var(--success); margin-right: 4px; }
+
+    /* ════════════════════════════════════════════════════════════════════════
+       DASHBOARD LAYOUT
+    ════════════════════════════════════════════════════════════════════════ */
+    #dashboard-screen { display: none; min-height: 100vh; }
+    #dashboard-screen.show { display: flex; }
+
+    /* Sidebar */
+    .sidebar {
+      width: var(--sidebar-w);
+      min-height: 100vh;
+      background: var(--bg-card);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0; left: 0;
+      z-index: 200;
+      transition: transform var(--transition);
+      box-shadow: 4px 0 24px rgba(0,0,0,.4);
+    }
+
+    .sidebar-logo {
+      padding: 24px 20px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .sidebar-logo .logo-sq {
+      width: 40px; height: 40px;
+      background: linear-gradient(135deg, var(--accent), #7c3aed);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+    .sidebar-logo h2 { font-size: 16px; font-weight: 800; letter-spacing: -.3px; }
+    .sidebar-logo h2 span { color: var(--accent); }
+    .sidebar-logo p { font-size: 11px; color: var(--text-3); margin-top: 1px; }
+
+    .sidebar-nav { flex: 1; padding: 16px 12px; }
+    .nav-section-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-3);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 8px 10px 4px;
+      margin-top: 8px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 11px 12px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: background var(--transition), color var(--transition);
+      color: var(--text-2);
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 2px;
+      user-select: none;
+    }
+    .nav-item:hover { background: var(--bg-hover); color: var(--text-1); }
+    .nav-item.active {
+      background: var(--accent-glow);
+      color: var(--accent);
+      border: 1px solid rgba(79,142,247,.2);
+    }
+    .nav-item i { width: 18px; text-align: center; font-size: 15px; }
+    .nav-item.danger:hover { background: rgba(239,68,68,.1); color: var(--danger); }
+
+    .sidebar-footer { padding: 16px; border-top: 1px solid var(--border); }
+    .admin-avatar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: var(--radius-sm);
+      background: var(--bg-elevated);
+    }
+    .avatar-circle {
+      width: 36px; height: 36px;
+      background: linear-gradient(135deg, var(--accent), #7c3aed);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+    .admin-avatar .info p { font-size: 13px; font-weight: 600; }
+    .admin-avatar .info span { font-size: 11px; color: var(--accent); }
+
+    /* Topbar */
+    .topbar {
+      position: fixed;
+      top: 0;
+      left: var(--sidebar-w);
+      right: 0;
+      height: var(--topbar-h);
+      background: rgba(10,13,22,.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+      z-index: 100;
+      gap: 16px;
+    }
+
+    .topbar-left h2 { font-size: 18px; font-weight: 700; }
+    .topbar-left p  { font-size: 12px; color: var(--text-2); margin-top: 1px; }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+
+    .refresh-btn {
+      padding: 7px 14px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text-2);
+      font-family: inherit;
+      font-size: 13px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all var(--transition);
+    }
+    .refresh-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .refresh-btn.spinning i { animation: spin .7s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .admin-chip {
+      background: var(--accent-glow);
+      border: 1px solid rgba(79,142,247,.25);
+      border-radius: var(--radius-sm);
+      padding: 6px 12px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Main content */
+    .main-content {
+      margin-left: var(--sidebar-w);
+      margin-top: var(--topbar-h);
+      padding: 28px;
+      min-height: calc(100vh - var(--topbar-h));
+      flex: 1;
+    }
+
+    /* Pages */
+    .page { display: none; animation: fadeIn .3s ease; }
+    .page.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* ── Stat Cards ─────────────────────────────────────────────────────────── */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+      margin-bottom: 28px;
+    }
+
+    .stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 24px;
+      position: relative;
+      overflow: hidden;
+      transition: border-color var(--transition), transform var(--transition);
+    }
+    .stat-card:hover { border-color: var(--border-bright); transform: translateY(-2px); }
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0; right: 0;
+      width: 80px; height: 80px;
+      border-radius: 0 0 0 80px;
+      opacity: .08;
+    }
+    .stat-card.blue::before   { background: var(--accent); }
+    .stat-card.green::before  { background: var(--success); }
+    .stat-card.red::before    { background: var(--danger); }
+    .stat-card.orange::before { background: var(--warning); }
+
+    .stat-icon {
+      width: 44px; height: 44px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      margin-bottom: 16px;
+    }
+    .stat-card.blue   .stat-icon { background: rgba(79,142,247,.15);  color: var(--accent); }
+    .stat-card.green  .stat-icon { background: rgba(34,197,94,.15);   color: var(--success); }
+    .stat-card.red    .stat-icon { background: rgba(239,68,68,.15);   color: var(--danger); }
+    .stat-card.orange .stat-icon { background: rgba(245,158,11,.15);  color: var(--warning); }
+
+    .stat-value {
+      font-size: 36px;
+      font-weight: 800;
+      letter-spacing: -1px;
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+    .stat-label {
+      font-size: 13px;
+      color: var(--text-2);
+      font-weight: 500;
+    }
+    .stat-badge {
+      position: absolute;
+      top: 20px; right: 20px;
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 99px;
+      font-weight: 600;
+    }
+    .stat-card.blue   .stat-badge { background: rgba(79,142,247,.15);  color: var(--accent); }
+    .stat-card.green  .stat-badge { background: rgba(34,197,94,.15);   color: var(--success); }
+    .stat-card.red    .stat-badge { background: rgba(239,68,68,.15);   color: var(--danger); }
+    .stat-card.orange .stat-badge { background: rgba(245,158,11,.15);  color: var(--warning); }
+
+    /* Extra stat row */
+    .sub-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+    .sub-stat {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 18px 20px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .sub-stat i { font-size: 22px; color: var(--accent); }
+    .sub-stat .label { font-size: 12px; color: var(--text-2); margin-bottom: 3px; }
+    .sub-stat .value { font-size: 22px; font-weight: 700; }
+
+    /* ── Students Table ─────────────────────────────────────────────────────── */
+    .table-section {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+    }
+
+    .table-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .table-header h3 { font-size: 16px; font-weight: 700; }
+    .table-header p  { font-size: 13px; color: var(--text-2); margin-top: 2px; }
+
+    .search-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .search-input-wrap { position: relative; }
+    .search-input-wrap i {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-3);
+      font-size: 14px;
+      pointer-events: none;
+    }
+    #search-input {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 9px 12px 9px 36px;
+      color: var(--text-1);
+      font-family: inherit;
+      font-size: 14px;
+      width: 260px;
+      outline: none;
+      transition: border-color var(--transition);
+    }
+    #search-input:focus { border-color: var(--accent); }
+    #search-input::placeholder { color: var(--text-3); }
+
+    .table-wrap { overflow-x: auto; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 800px;
+    }
+    thead tr { background: var(--bg-elevated); }
+    th {
+      padding: 13px 20px;
+      text-align: left;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-2);
+      text-transform: uppercase;
+      letter-spacing: .8px;
+      white-space: nowrap;
+    }
+    tbody tr {
+      border-bottom: 1px solid var(--border);
+      transition: background var(--transition);
+    }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: var(--bg-hover); }
+    td {
+      padding: 14px 20px;
+      font-size: 14px;
+      vertical-align: middle;
+    }
+    td.muted { color: var(--text-2); font-size: 13px; }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 10px;
+      border-radius: 99px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .status-badge.active   { background: rgba(34,197,94,.12);  color: var(--success); border: 1px solid rgba(34,197,94,.25); }
+    .status-badge.inactive { background: rgba(239,68,68,.12);  color: var(--danger);  border: 1px solid rgba(239,68,68,.25); }
+    .status-badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; display: inline-block; }
+
+    .actions { display: flex; align-items: center; gap: 8px; }
+
+    .btn-toggle {
+      padding: 5px 12px;
+      border: none;
+      border-radius: 6px;
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .btn-toggle.deactivate { background: rgba(239,68,68,.1); color: var(--danger); }
+    .btn-toggle.deactivate:hover { background: rgba(239,68,68,.2); }
+    .btn-toggle.activate   { background: rgba(34,197,94,.1);  color: var(--success); }
+    .btn-toggle.activate:hover { background: rgba(34,197,94,.2); }
+
+    .btn-delete {
+      padding: 5px 10px;
+      border: none;
+      border-radius: 6px;
+      background: rgba(239,68,68,.08);
+      color: var(--danger);
+      font-size: 13px;
+      cursor: pointer;
+      transition: all var(--transition);
+    }
+    .btn-delete:hover { background: rgba(239,68,68,.2); transform: scale(1.1); }
+
+    /* Empty state */
+    .empty-state {
+      padding: 60px 20px;
+      text-align: center;
+      color: var(--text-2);
+      display: none;
+    }
+    .empty-state i { font-size: 40px; margin-bottom: 12px; opacity: .3; }
+    .empty-state p { font-size: 15px; }
+
+    /* Loading skeleton */
+    .skeleton {
+      background: linear-gradient(90deg, var(--bg-elevated) 25%, var(--bg-hover) 50%, var(--bg-elevated) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.2s infinite;
+      border-radius: 6px;
+      height: 16px;
+    }
+    @keyframes shimmer { to { background-position: -200% 0; } }
+
+    /* ── Toast ──────────────────────────────────────────────────────────────── */
+    #toast {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-bright);
+      border-radius: var(--radius-md);
+      padding: 14px 20px;
+      font-size: 14px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      z-index: 9999;
+      transform: translateY(80px);
+      opacity: 0;
+      transition: all .35s cubic-bezier(.4,0,.2,1);
+      max-width: 340px;
+      box-shadow: 0 8px 32px rgba(0,0,0,.4);
+    }
+    #toast.show { transform: translateY(0); opacity: 1; }
+    #toast.success { border-color: rgba(34,197,94,.4); }
+    #toast.success i { color: var(--success); }
+    #toast.error { border-color: rgba(239,68,68,.4); }
+    #toast.error i { color: var(--danger); }
+    #toast.info i { color: var(--accent); }
+
+    /* ── Confirm Modal ──────────────────────────────────────────────────────── */
+    #confirm-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.7);
+      backdrop-filter: blur(4px);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    #confirm-modal.show { display: flex; }
+    .modal-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border-bright);
+      border-radius: var(--radius-lg);
+      padding: 32px;
+      max-width: 400px;
+      width: 100%;
+      text-align: center;
+      animation: popIn .25s ease forwards;
+    }
+    @keyframes popIn {
+      from { opacity: 0; transform: scale(.9); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+    .modal-icon {
+      width: 64px; height: 64px;
+      background: rgba(239,68,68,.1);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      color: var(--danger);
+      margin: 0 auto 20px;
+    }
+    .modal-box h3 { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+    .modal-box p  { font-size: 14px; color: var(--text-2); margin-bottom: 24px; line-height: 1.6; }
+    .modal-actions { display: flex; gap: 12px; }
+    .btn-cancel {
+      flex: 1;
+      padding: 11px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text-1);
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all var(--transition);
+    }
+    .btn-cancel:hover { border-color: var(--border-bright); }
+    .btn-confirm {
+      flex: 1;
+      padding: 11px;
+      background: var(--danger);
+      border: none;
+      border-radius: var(--radius-sm);
+      color: #fff;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all var(--transition);
+    }
+    .btn-confirm:hover { background: var(--danger-dim); }
+
+    /* ── Responsive ─────────────────────────────────────────────────────────── */
+    .hamburger {
+      display: none;
+      background: none;
+      border: none;
+      color: var(--text-1);
+      font-size: 22px;
+      cursor: pointer;
+      padding: 6px;
+    }
+    .overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.5);
+      z-index: 150;
+    }
+
+    @media (max-width: 900px) {
+      .sidebar {
+        transform: translateX(-100%);
+        z-index: 300;
+      }
+      .sidebar.open { transform: translateX(0); }
+      .hamburger  { display: block; }
+      .overlay.show { display: block; }
+      .topbar { left: 0; }
+      .main-content { margin-left: 0; }
+    }
+    @media (max-width: 600px) {
+      .main-content { padding: 16px; }
+      .topbar { padding: 0 16px; }
+      .stat-value { font-size: 28px; }
+      #search-input { width: 200px; }
+    }
+
+    /* ── Sessions Table ─────────────────────────────────────────────────────── */
+    .session-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 9px;
+      border-radius: 99px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .session-badge.online  { background: rgba(34,197,94,.12);  color: var(--success); border: 1px solid rgba(34,197,94,.25); }
+    .session-badge.offline { background: rgba(90,106,138,.12); color: var(--text-3);  border: 1px solid rgba(90,106,138,.25); }
+    .session-badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; display: inline-block; }
+
+    .online-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      background: rgba(34,197,94,.12);
+      border: 1px solid rgba(34,197,94,.3);
+      border-radius: 99px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--success);
+      animation: pulse-green 2s infinite;
+    }
+    @keyframes pulse-green {
+      0%,100% { box-shadow: 0 0 0 0 rgba(34,197,94,.4); }
+      50%      { box-shadow: 0 0 0 6px rgba(34,197,94,0); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ════════════════════ LOGIN SCREEN ════════════════════ -->
+<div id="login-screen">
+  <div class="login-wrap">
+    <div class="login-logo">
+      <div class="logo-icon">🏥</div>
+      <h1>Med<span>Mentor</span></h1>
+      <p>Admin Control Panel</p>
+    </div>
+    <div class="login-card">
+      <h2>Welcome back, Admin</h2>
+      <p class="sub">Sign in to manage the MedMentor platform</p>
+      <form id="login-form" onsubmit="handleLogin(event)">
+        <div class="form-group">
+          <label for="login-username">Username</label>
+          <div class="input-wrap">
+            <i class="fa-solid fa-user"></i>
+            <input type="text" id="login-username" placeholder="Rohan" autocomplete="username" required />
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="login-password">Password</label>
+          <div class="input-wrap">
+            <i class="fa-solid fa-lock"></i>
+            <input type="password" id="login-password" placeholder="••••••••••" autocomplete="current-password" required />
+          </div>
+        </div>
+        <button type="submit" class="btn-login" id="login-btn">
+          <i class="fa-solid fa-shield-halved"></i> Sign In to Dashboard
+        </button>
+      </form>
+      <div class="login-err" id="login-err"></div>
+      <p class="login-badge"><i class="fa-solid fa-circle-check"></i> Secured with JWT • Separate admin session</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════ DASHBOARD ════════════════════ -->
+<div id="dashboard-screen">
+
+  <!-- Sidebar -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-sq">🏥</div>
+      <div>
+        <h2>Med<span>Mentor</span></h2>
+        <p>Admin Panel v5.0</p>
+      </div>
+    </div>
+    <div class="sidebar-nav">
+      <div class="nav-section-label">Navigation</div>
+      <div class="nav-item active" id="nav-dashboard" onclick="showPage('dashboard')">
+        <i class="fa-solid fa-gauge-high"></i> Dashboard
+      </div>
+      <div class="nav-item" id="nav-students" onclick="showPage('students')">
+        <i class="fa-solid fa-users"></i> Students
+      </div>
+      <div class="nav-item" id="nav-sessions" onclick="showPage('sessions')">
+        <i class="fa-solid fa-clock-rotate-left"></i> Sessions
+        <span id="online-pill" style="margin-left:auto;font-size:10px;background:rgba(34,197,94,.15);color:var(--success);padding:2px 7px;border-radius:99px;font-weight:700;">0 online</span>
+      </div>
+      <div class="nav-section-label" style="margin-top:16px">Account</div>
+      <div class="nav-item" onclick="showPage('settings')">
+        <i class="fa-solid fa-gear"></i> Settings
+      </div>
+      <div class="nav-item danger" onclick="confirmLogout()">
+        <i class="fa-solid fa-right-from-bracket"></i> Logout
+      </div>
+    </div>
+    <div class="sidebar-footer">
+      <div class="admin-avatar">
+        <div class="avatar-circle">R</div>
+        <div class="info">
+          <p>Rohan</p>
+          <span>● Administrator</span>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Overlay for mobile -->
+  <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
+  <!-- Topbar -->
+  <header class="topbar">
+    <div style="display:flex; align-items:center; gap:12px;">
+      <button class="hamburger" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
+      <div class="topbar-left">
+        <h2 id="page-title">Dashboard</h2>
+        <p id="page-sub">Overview &amp; Statistics</p>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <button class="refresh-btn" id="refresh-btn" onclick="refreshData()">
+        <i class="fa-solid fa-rotate-right"></i> Refresh
+      </button>
+      <div class="admin-chip">
+        <i class="fa-solid fa-shield-halved"></i> MedMentor Admin
+      </div>
+    </div>
+  </header>
+
+  <!-- Main -->
+  <main class="main-content">
+
+    <!-- ── DASHBOARD PAGE ── -->
+    <section class="page active" id="page-dashboard">
+      <div class="stats-grid">
+        <div class="stat-card blue">
+          <div class="stat-icon"><i class="fa-solid fa-users"></i></div>
+          <div class="stat-value" id="stat-total">—</div>
+          <div class="stat-label">Total Students</div>
+          <span class="stat-badge">All Time</span>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-icon"><i class="fa-solid fa-circle-check"></i></div>
+          <div class="stat-value" id="stat-active">—</div>
+          <div class="stat-label">Active Accounts</div>
+          <span class="stat-badge">Enabled</span>
+        </div>
+        <div class="stat-card red">
+          <div class="stat-icon"><i class="fa-solid fa-ban"></i></div>
+          <div class="stat-value" id="stat-inactive">—</div>
+          <div class="stat-label">Inactive Accounts</div>
+          <span class="stat-badge">Suspended</span>
+        </div>
+        <div class="stat-card orange">
+          <div class="stat-icon"><i class="fa-solid fa-calendar-day"></i></div>
+          <div class="stat-value" id="stat-today">—</div>
+          <div class="stat-label">Registered Today</div>
+          <span class="stat-badge">Today</span>
+        </div>
+        <div class="stat-card" style="border-color:rgba(34,197,94,.3);background:linear-gradient(135deg,rgba(34,197,94,.06),var(--bg-card));">
+          <div class="stat-icon" style="background:rgba(34,197,94,.15);color:var(--success);"><i class="fa-solid fa-circle-dot"></i></div>
+          <div class="stat-value" id="stat-online" style="color:var(--success);">—</div>
+          <div class="stat-label">Currently Online</div>
+          <span class="stat-badge" style="background:rgba(34,197,94,.15);color:var(--success);">Live</span>
+        </div>
+      </div>
+
+      <div class="sub-stats">
+        <div class="sub-stat">
+          <i class="fa-solid fa-calendar-week"></i>
+          <div>
+            <div class="label">This Week</div>
+            <div class="value" id="stat-week">—</div>
+          </div>
+        </div>
+        <div class="sub-stat">
+          <i class="fa-solid fa-pills"></i>
+          <div>
+            <div class="label">Drug Checks Done</div>
+            <div class="value" id="stat-drug">—</div>
+          </div>
+        </div>
+        <div class="sub-stat">
+          <i class="fa-solid fa-percent"></i>
+          <div>
+            <div class="label">Activation Rate</div>
+            <div class="value" id="stat-rate">—</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick table preview -->
+      <div class="table-section">
+        <div class="table-header">
+          <div>
+            <h3>Recent Registrations</h3>
+            <p>Last 5 students who joined</p>
+          </div>
+          <button class="refresh-btn" onclick="showPage('students')">
+            View All <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Course</th>
+                <th>Joined</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="recent-tbody"></tbody>
+          </table>
+          <div class="empty-state" id="recent-empty">
+            <i class="fa-solid fa-users-slash"></i>
+            <p>No students registered yet</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent sessions preview -->
+      <div class="table-section" style="margin-top:20px">
+        <div class="table-header">
+          <div>
+            <h3>Recent Login Activity</h3>
+            <p>Last 5 session events</p>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span class="online-pill"><i class="fa-solid fa-circle-dot"></i> <span id="online-count-dash">0</span> online now</span>
+            <button class="refresh-btn" onclick="showPage('sessions')">
+              View All <i class="fa-solid fa-arrow-right"></i>
+            </button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Student</th>
+                <th>Email</th>
+                <th>Logged In</th>
+                <th>Logged Out</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="recent-sessions-tbody"></tbody>
+          </table>
+          <div class="empty-state" id="recent-sessions-empty">
+            <i class="fa-solid fa-clock"></i>
+            <p>No sessions yet</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── STUDENTS PAGE ── -->
+    <section class="page" id="page-students">
+      <div class="table-section">
+        <div class="table-header">
+          <div>
+            <h3>All Students</h3>
+            <p id="students-count-label">Loading...</p>
+          </div>
+          <div class="search-wrap">
+            <div class="search-input-wrap">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <input type="text" id="search-input" placeholder="Search name or email…" oninput="filterStudents()" />
+            </div>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>College</th>
+                <th>Course</th>
+                <th>Registered</th>
+                <th>Last Seen</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="students-tbody"></tbody>
+          </table>
+          <div class="empty-state" id="students-empty">
+            <i class="fa-solid fa-users-slash"></i>
+            <p>No students found</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── SESSIONS PAGE ── -->
+    <section class="page" id="page-sessions">
+      <div class="table-section">
+        <div class="table-header">
+          <div>
+            <h3>Session History</h3>
+            <p id="sessions-count-label">Loading...</p>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span class="online-pill"><i class="fa-solid fa-circle-dot"></i> <span id="online-count-sess">0</span> online now</span>
+            <div class="search-input-wrap">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <input type="text" id="session-search" placeholder="Search name or email…" oninput="filterSessions()" style="background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius-sm);padding:9px 12px 9px 36px;color:var(--text-1);font-family:inherit;font-size:14px;width:240px;outline:none;" />
+            </div>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table style="min-width:700px;">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Student</th>
+                <th>Email</th>
+                <th>Logged In</th>
+                <th>Logged Out</th>
+                <th>Duration</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="sessions-tbody"></tbody>
+          </table>
+          <div class="empty-state" id="sessions-empty">
+            <i class="fa-solid fa-clock"></i>
+            <p>No sessions recorded yet</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── SETTINGS PAGE ── -->
+    <section class="page" id="page-settings">
+      <div class="table-section" style="padding:32px; max-width:520px;">
+        <div style="display:flex; align-items:center; gap:14px; margin-bottom:24px;">
+          <div class="stat-icon" style="background:var(--accent-glow); color:var(--accent); font-size:22px;">
+            <i class="fa-solid fa-gear"></i>
+          </div>
+          <div>
+            <h3 style="font-size:18px;">Settings</h3>
+            <p style="color:var(--text-2); font-size:13px;">Admin account information</p>
+          </div>
+        </div>
+        <div style="display:grid; gap:16px;">
+          <div style="background:var(--bg-elevated); border:1px solid var(--border); border-radius:var(--radius-sm); padding:16px 20px;">
+            <div style="font-size:11px; color:var(--text-3); text-transform:uppercase; letter-spacing:.8px; margin-bottom:6px;">Username</div>
+            <div style="font-weight:600;">Rohan</div>
+          </div>
+          <div style="background:var(--bg-elevated); border:1px solid var(--border); border-radius:var(--radius-sm); padding:16px 20px;">
+            <div style="font-size:11px; color:var(--text-3); text-transform:uppercase; letter-spacing:.8px; margin-bottom:6px;">Role</div>
+            <div style="font-weight:600; color:var(--accent);">Super Administrator</div>
+          </div>
+          <div style="background:var(--bg-elevated); border:1px solid var(--border); border-radius:var(--radius-sm); padding:16px 20px;">
+            <div style="font-size:11px; color:var(--text-3); text-transform:uppercase; letter-spacing:.8px; margin-bottom:6px;">Session</div>
+            <div style="font-weight:600; color:var(--success);">● Active (12h JWT)</div>
+          </div>
+          <div style="background:var(--bg-elevated); border:1px solid var(--border); border-radius:var(--radius-sm); padding:16px 20px;">
+            <div style="font-size:11px; color:var(--text-3); text-transform:uppercase; letter-spacing:.8px; margin-bottom:6px;">Database</div>
+            <div style="font-weight:600; color:var(--text-2);">medmentor.db (SQLite)</div>
+          </div>
+        </div>
+        <button class="btn-login" style="margin-top:24px; background:linear-gradient(135deg,var(--danger),#9f1239);" onclick="confirmLogout()">
+          <i class="fa-solid fa-right-from-bracket"></i> Logout
+        </button>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- ── Delete Confirm Modal ── -->
+<div id="confirm-modal">
+  <div class="modal-box">
+    <div class="modal-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+    <h3>Delete Student?</h3>
+    <p id="confirm-text">This action is <strong>permanent</strong> and cannot be undone. The student's data will be removed from the database.</p>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-confirm" id="confirm-btn" onclick="executeDelete()">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Toast ── -->
+<div id="toast"><i class="fa-solid fa-circle-check"></i> <span id="toast-msg"></span></div>
+
+<script>
+  /* ═══════════════════════════════════════════════════════════════
+     CONFIGURATION
+  ═══════════════════════════════════════════════════════════════ */
+  const API_BASE   = 'http://localhost:8000';
+  const TOKEN_KEY  = 'mm_admin_token';
+  let allStudents  = [];
+  let allSessions  = [];
+  let pendingDeleteId = null;
+  let refreshTimer = null;
+
+  /* ═══════════════════════════════════════════════════════════════
+     HELPERS
+  ═══════════════════════════════════════════════════════════════ */
+  const token  = () => localStorage.getItem(TOKEN_KEY);
+  const hdr    = () => ({ 'Content-Type':'application/json', 'Authorization':'Bearer '+token() });
+
+  async function apiFetch(path, opts={}) {
+    const res  = await fetch(API_BASE + path, { headers: hdr(), ...opts });
+    const data = await res.json();
+    if (res.status === 401) { logout(); return null; }
+    return data;
+  }
+
+  function showToast(msg, type='info') {
+    const t  = document.getElementById('toast');
+    const i  = t.querySelector('i');
+    const sp = document.getElementById('toast-msg');
+    t.className = 'show ' + type;
+    i.className = type === 'success' ? 'fa-solid fa-circle-check'
+                : type === 'error'   ? 'fa-solid fa-circle-xmark'
+                                     : 'fa-solid fa-circle-info';
+    sp.textContent = msg;
+    clearTimeout(t._tid);
+    t._tid = setTimeout(() => t.className = '', 3200);
+  }
+
+  function formatDate(dt) {
+    if (!dt) return '—';
+    try {
+      return new Date(dt).toLocaleDateString('en-IN', {
+        day:'2-digit', month:'short', year:'numeric'
+      });
+    } catch { return dt.slice(0,10); }
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     AUTH
+  ═══════════════════════════════════════════════════════════════ */
+  async function handleLogin(e) {
+    e.preventDefault();
+    const btn  = document.getElementById('login-btn');
+    const errEl = document.getElementById('login-err');
+    const user = document.getElementById('login-username').value.trim();
+    const pass = document.getElementById('login-password').value;
+
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Signing in…';
+    btn.disabled  = true;
+    errEl.classList.remove('show');
+
+    try {
+      const res = await fetch(API_BASE+'/admin/login', {
+        method : 'POST',
+        headers: {'Content-Type':'application/json'},
+        body   : JSON.stringify({username:user, password:pass})
+      });
+      const data = await res.json();
+      if (data.success) {
+        localStorage.setItem(TOKEN_KEY, data.token);
+        enterDashboard();
+      } else {
+        errEl.textContent = data.message || 'Invalid credentials';
+        errEl.classList.add('show');
+        btn.innerHTML = '<i class="fa-solid fa-shield-halved"></i> Sign In to Dashboard';
+        btn.disabled  = false;
+      }
+    } catch (err) {
+      errEl.textContent = '⚠️ Cannot connect to server. Is the backend running?';
+      errEl.classList.add('show');
+      btn.innerHTML = '<i class="fa-solid fa-shield-halved"></i> Sign In to Dashboard';
+      btn.disabled  = false;
+    }
+  }
+
+  function logout() {
+    localStorage.removeItem(TOKEN_KEY);
+    clearInterval(refreshTimer);
+    document.getElementById('dashboard-screen').classList.remove('show');
+    document.getElementById('login-screen').style.display = 'flex';
+  }
+
+  function confirmLogout() {
+    pendingDeleteId = '__logout__';
+    document.getElementById('confirm-text').innerHTML =
+      'Are you sure you want to <strong>sign out</strong> of the admin panel?';
+    document.getElementById('confirm-btn').textContent = 'Logout';
+    document.getElementById('confirm-modal').classList.add('show');
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     INIT
+  ═══════════════════════════════════════════════════════════════ */
+  async function enterDashboard() {
+    document.getElementById('login-screen').style.display = 'none';
+    const dash = document.getElementById('dashboard-screen');
+    dash.classList.add('show');
+    await loadAll();
+    /* auto-refresh every 30s */
+    refreshTimer = setInterval(loadAll, 30000);
+  }
+
+  async function checkSession() {
+    const t = token();
+    if (!t) { return; } /* stay on login */
+    const data = await fetch(API_BASE+'/admin/verify', {
+      headers: {'Authorization':'Bearer '+t}
+    }).then(r => r.json()).catch(() => ({valid:false}));
+    if (data.valid) { enterDashboard(); }
+    else { localStorage.removeItem(TOKEN_KEY); }
+  }
+
+  async function loadAll() {
+    await Promise.all([loadStats(), loadStudents(), loadSessions()]);
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     STATS
+  ═══════════════════════════════════════════════════════════════ */
+  async function loadStats() {
+    const data = await apiFetch('/admin/stats');
+    if (!data) return;
+
+    animateCount('stat-total',    data.total_students);
+    animateCount('stat-active',   data.active_students);
+    animateCount('stat-inactive', data.inactive_students);
+    animateCount('stat-today',    data.registrations_today);
+    animateCount('stat-week',     data.registrations_week);
+    animateCount('stat-drug',     data.drug_checks_total);
+
+    const rate = data.total_students > 0
+      ? Math.round((data.active_students / data.total_students) * 100)
+      : 0;
+    document.getElementById('stat-rate').textContent = rate + '%';
+  }
+
+  function animateCount(id, target) {
+    const el  = document.getElementById(id);
+    const end = parseInt(target) || 0;
+    const dur = 600;
+    const step = Math.ceil(end / (dur / 16));
+    let cur = 0;
+    const tick = () => {
+      cur = Math.min(cur + step, end);
+      el.textContent = cur;
+      if (cur < end) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     STUDENTS
+  ═══════════════════════════════════════════════════════════════ */
+  async function loadStudents() {
+    const data = await apiFetch('/admin/students');
+    if (!data || !data.success) return;
+    allStudents = data.students || [];
+    renderStudents(allStudents);
+    renderRecent(allStudents.slice(0, 5));
+  }
+
+  /* ════════════════════════════════════════════════════════════
+     SESSIONS
+  ════════════════════════════════════════════════════════════ */
+  async function loadSessions() {
+    const data = await apiFetch('/admin/sessions');
+    if (!data || !data.success) return;
+    allSessions = data.sessions || [];
+    const online = data.online_count || 0;
+
+    // Update all online counts
+    ['stat-online','online-count-dash','online-count-sess'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = online;
+    });
+    const pill = document.getElementById('online-pill');
+    if (pill) pill.textContent = online + ' online';
+
+    renderSessions(allSessions);
+    renderRecentSessions(allSessions.slice(0, 5));
+  }
+
+  function sessionDuration(login, logout) {
+    if (!login) return '—';
+    const end   = logout ? new Date(logout) : new Date();
+    const start = new Date(login);
+    const mins  = Math.round((end - start) / 60000);
+    if (mins < 1)  return '< 1 min';
+    if (mins < 60) return mins + ' min';
+    const hrs  = Math.floor(mins / 60);
+    const rem  = mins % 60;
+    return rem > 0 ? `${hrs}h ${rem}m` : `${hrs}h`;
+  }
+
+  function formatDateTime(dt) {
+    if (!dt) return '—';
+    try {
+      return new Date(dt).toLocaleString('en-IN', {
+        day:'2-digit', month:'short', year:'numeric',
+        hour:'2-digit', minute:'2-digit', hour12:true
+      });
+    } catch { return dt.slice(0,16); }
+  }
+
+  function renderSessions(list) {
+    const tbody    = document.getElementById('sessions-tbody');
+    const empty    = document.getElementById('sessions-empty');
+    const countLbl = document.getElementById('sessions-count-label');
+    if (countLbl) countLbl.textContent = `${list.length} session${list.length !== 1 ? 's' : ''} total`;
+    if (!list.length) { tbody.innerHTML = ''; empty.style.display = 'block'; return; }
+    empty.style.display = 'none';
+    tbody.innerHTML = list.map((s, i) => `
+      <tr>
+        <td class="muted">${i + 1}</td>
+        <td><strong>${escHtml(s.full_name)}</strong></td>
+        <td class="muted">${escHtml(s.email)}</td>
+        <td class="muted" style="font-size:12px;">${formatDateTime(s.login_at)}</td>
+        <td class="muted" style="font-size:12px;">${s.logout_at ? formatDateTime(s.logout_at) : '<span style="color:var(--success)">● Active</span>'}</td>
+        <td class="muted" style="font-size:12px;">${sessionDuration(s.login_at, s.logout_at)}</td>
+        <td>
+          <span class="session-badge ${s.is_active ? 'online' : 'offline'}">
+            ${s.is_active ? 'Online' : 'Offline'}
+          </span>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  function renderRecentSessions(list) {
+    const tbody = document.getElementById('recent-sessions-tbody');
+    const empty = document.getElementById('recent-sessions-empty');
+    if (!tbody) return;
+    if (!list.length) { tbody.innerHTML = ''; if(empty) empty.style.display = 'block'; return; }
+    if (empty) empty.style.display = 'none';
+    tbody.innerHTML = list.map(s => `
+      <tr>
+        <td><strong>${escHtml(s.full_name)}</strong></td>
+        <td class="muted">${escHtml(s.email)}</td>
+        <td class="muted" style="font-size:12px;">${formatDateTime(s.login_at)}</td>
+        <td class="muted" style="font-size:12px;">${s.logout_at ? formatDateTime(s.logout_at) : '<span style="color:var(--success)">● Active</span>'}</td>
+        <td>
+          <span class="session-badge ${s.is_active ? 'online' : 'offline'}">
+            ${s.is_active ? 'Online' : 'Offline'}
+          </span>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  function filterSessions() {
+    const q = (document.getElementById('session-search')?.value || '').toLowerCase().trim();
+    if (!q) { renderSessions(allSessions); return; }
+    renderSessions(allSessions.filter(s =>
+      (s.full_name || '').toLowerCase().includes(q) ||
+      (s.email     || '').toLowerCase().includes(q)
+    ));
+  }
+
+  function getLastSeen(email) {
+    const sess = allSessions.find(s => s.email === email);
+    if (!sess) return '—';
+    if (sess.is_active) return '<span style="color:var(--success);font-size:11px">● Online</span>';
+    return `<span style="font-size:11px;color:var(--text-2);">${formatDateTime(sess.login_at)}</span>`;
+  }
+
+  function renderStudents(list) {
+    const tbody   = document.getElementById('students-tbody');
+    const empty   = document.getElementById('students-empty');
+    const countLbl = document.getElementById('students-count-label');
+
+    countLbl.textContent = `${list.length} student${list.length !== 1 ? 's' : ''} found`;
+
+    if (!list.length) {
+      tbody.innerHTML  = '';
+      empty.style.display = 'block';
+      return;
+    }
+    empty.style.display = 'none';
+    tbody.innerHTML = list.map(s => `
+      <tr id="row-${s.id}">
+        <td class="muted">${s.id}</td>
+        <td><strong>${escHtml(s.full_name)}</strong></td>
+        <td class="muted">${escHtml(s.email)}</td>
+        <td class="muted">${escHtml(s.college)}</td>
+        <td class="muted">${escHtml(s.course)}</td>
+        <td class="muted">${formatDate(s.created_at)}</td>
+        <td>${getLastSeen(s.email)}</td>
+        <td>
+          <span class="status-badge ${s.is_active ? 'active' : 'inactive'}">
+            ${s.is_active ? 'Active' : 'Inactive'}
+          </span>
+        </td>
+        <td>
+          <div class="actions">
+            <button class="btn-toggle ${s.is_active ? 'deactivate' : 'activate'}"
+                    id="toggle-btn-${s.id}"
+                    onclick="toggleStudent(${s.id}, ${s.is_active})">
+              <i class="fa-solid ${s.is_active ? 'fa-ban' : 'fa-circle-check'}"></i>
+              ${s.is_active ? 'Deactivate' : 'Activate'}
+            </button>
+            <button class="btn-delete" title="Delete student" onclick="promptDelete(${s.id}, '${escHtml(s.full_name)}')">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          </div>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  function renderRecent(list) {
+    const tbody = document.getElementById('recent-tbody');
+    const empty = document.getElementById('recent-empty');
+    if (!list.length) { tbody.innerHTML = ''; empty.style.display = 'block'; return; }
+    empty.style.display = 'none';
+    tbody.innerHTML = list.map(s => `
+      <tr>
+        <td><strong>${escHtml(s.full_name)}</strong></td>
+        <td class="muted">${escHtml(s.email)}</td>
+        <td class="muted">${escHtml(s.course)}</td>
+        <td class="muted">${formatDate(s.created_at)}</td>
+        <td>
+          <span class="status-badge ${s.is_active ? 'active' : 'inactive'}">
+            ${s.is_active ? 'Active' : 'Inactive'}
+          </span>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  function filterStudents() {
+    const q = document.getElementById('search-input').value.toLowerCase().trim();
+    if (!q) { renderStudents(allStudents); return; }
+    const filtered = allStudents.filter(s =>
+      s.full_name.toLowerCase().includes(q) ||
+      s.email.toLowerCase().includes(q) ||
+      (s.college || '').toLowerCase().includes(q)
+    );
+    renderStudents(filtered);
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     TOGGLE STUDENT
+  ═══════════════════════════════════════════════════════════════ */
+  async function toggleStudent(id, currentlyActive) {
+    const btn = document.getElementById('toggle-btn-' + id);
+    if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>'; }
+
+    const data = await apiFetch(`/admin/students/${id}/toggle`, { method: 'PUT' });
+    if (!data) return;
+
+    if (data.success) {
+      showToast(data.message, 'success');
+      await loadAll();
+    } else {
+      showToast(data.message || 'Failed to update student', 'error');
+      if (btn) { btn.disabled = false; }
+    }
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     DELETE STUDENT
+  ═══════════════════════════════════════════════════════════════ */
+  function promptDelete(id, name) {
+    pendingDeleteId = id;
+    document.getElementById('confirm-text').innerHTML =
+      `You are about to <strong>permanently delete</strong> the student <strong>${escHtml(name)}</strong>.<br>This cannot be undone.`;
+    document.getElementById('confirm-btn').textContent = 'Delete';
+    document.getElementById('confirm-modal').classList.add('show');
+  }
+
+  async function executeDelete() {
+    if (pendingDeleteId === '__logout__') { closeModal(); logout(); return; }
+
+    const id = pendingDeleteId;
+    closeModal();
+
+    const data = await apiFetch(`/admin/students/${id}`, { method: 'DELETE' });
+    if (!data) return;
+
+    if (data.success) {
+      showToast('Student deleted successfully', 'success');
+      await loadAll();
+    } else {
+      showToast(data.message || 'Failed to delete student', 'error');
+    }
+  }
+
+  function closeModal() {
+    document.getElementById('confirm-modal').classList.remove('show');
+    pendingDeleteId = null;
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     NAVIGATION
+  ═══════════════════════════════════════════════════════════════ */
+  const PAGE_META = {
+    dashboard: { title: 'Dashboard',  sub: 'Overview & Statistics' },
+    students : { title: 'Students',   sub: 'Manage all student accounts' },
+    sessions : { title: 'Sessions',   sub: 'Login & logout history' },
+    settings : { title: 'Settings',   sub: 'Admin account settings' },
+  };
+
+  function showPage(name) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById('page-' + name).classList.add('active');
+    const nav = document.getElementById('nav-' + name);
+    if (nav) nav.classList.add('active');
+    const meta = PAGE_META[name] || {};
+    document.getElementById('page-title').textContent = meta.title || name;
+    document.getElementById('page-sub').textContent   = meta.sub   || '';
+    closeSidebar();
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     REFRESH BUTTON
+  ═══════════════════════════════════════════════════════════════ */
+  async function refreshData() {
+    const btn = document.getElementById('refresh-btn');
+    btn.classList.add('spinning');
+    await loadAll();
+    btn.classList.remove('spinning');
+    showToast('Data refreshed', 'success');
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     SIDEBAR (mobile)
+  ═══════════════════════════════════════════════════════════════ */
+  function toggleSidebar() {
+    document.getElementById('sidebar').classList.toggle('open');
+    document.getElementById('overlay').classList.toggle('show');
+  }
+  function closeSidebar() {
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('overlay').classList.remove('show');
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     UTILS
+  ═══════════════════════════════════════════════════════════════ */
+  function escHtml(str) {
+    if (!str) return '';
+    return String(str)
+      .replace(/&/g,'&amp;')
+      .replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;')
+      .replace(/'/g,'&#39;');
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     BOOT
+  ═══════════════════════════════════════════════════════════════ */
+  checkSession();
+</script>
+</body>
+</html>

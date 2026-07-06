@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MedMentor — Student Login</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700&family=Outfit:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap"
+        rel="stylesheet" />
+    <style>
+        :root {
+            --bg: #0a0d16;
+            --surface: #111520;
+            --surface2: #181d2e;
+            --border: rgba(255, 255, 255, 0.07);
+            --border2: rgba(255, 255, 255, 0.13);
+            --accent: #4f8ef7;
+            --accent2: #7c6af5;
+            --green: #22c55e;
+            --red: #ef4444;
+            --text: #f0f2f8;
+            --text2: #9aa3b8;
+            --text3: #5a6380;
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html,
+        body {
+            height: 100%;
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            overflow: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(ellipse 70% 60% at 20% 30%, rgba(79, 142, 247, 0.08) 0%, transparent 60%), radial-gradient(ellipse 50% 40% at 80% 70%, rgba(124, 106, 245, 0.06) 0%, transparent 60%);
+            pointer-events: none;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .card {
+            width: 100%;
+            max-width: 440px;
+            background: var(--surface);
+            border: 1px solid var(--border2);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.5);
+        }
+
+        .card-header {
+            padding: 32px 36px 24px;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .logo {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #4f8ef7, #7c6af5);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            box-shadow: 0 8px 24px rgba(79, 142, 247, 0.3);
+        }
+
+        .logo-text {
+            font-family: 'Syne', sans-serif;
+            font-size: 22px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #4f8ef7, #7c6af5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .card-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 6px;
+        }
+
+        .card-subtitle {
+            font-size: 13px;
+            color: var(--text2);
+        }
+
+        .tabs {
+            display: flex;
+            background: var(--surface2);
+            border-radius: 10px;
+            padding: 4px;
+            margin: 0 36px 0;
+            gap: 4px;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 8px;
+            border: none;
+            border-radius: 7px;
+            cursor: pointer;
+            font-family: 'Outfit', sans-serif;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s;
+            background: transparent;
+            color: var(--text2);
+        }
+
+        .tab.active {
+            background: linear-gradient(135deg, #4f8ef7, #7c6af5);
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(79, 142, 247, 0.3);
+        }
+
+        .card-body {
+            padding: 24px 36px 32px;
+        }
+
+        .form {
+            display: none;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .form.active {
+            display: flex;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        label {
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--text2);
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            font-family: 'DM Mono', monospace;
+        }
+
+        .input {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 9px;
+            padding: 10px 13px;
+            color: var(--text);
+            font-family: 'Outfit', sans-serif;
+            font-size: 13px;
+            width: 100%;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(79, 142, 247, 0.1);
+        }
+
+        .input::placeholder {
+            color: var(--text3);
+        }
+
+        .input.error {
+            border-color: var(--red);
+        }
+
+        .input.success {
+            border-color: var(--green);
+        }
+
+        select.input {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%239aa3b8' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+        }
+
+        select.input option {
+            background: #181d2e;
+        }
+
+        .pw-wrap {
+            position: relative;
+        }
+
+        .pw-wrap .input {
+            padding-right: 40px;
+        }
+
+        .pw-eye {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text3);
+            font-size: 15px;
+            padding: 0;
+        }
+
+        .pw-eye:hover {
+            color: var(--text2);
+        }
+
+        .email-hint {
+            font-size: 11px;
+            color: var(--text3);
+            margin-top: 3px;
+            font-family: 'DM Mono', monospace;
+        }
+
+        .email-hint.valid {
+            color: var(--green);
+        }
+
+        .email-hint.invalid {
+            color: var(--red);
+        }
+
+        .btn-submit {
+            background: linear-gradient(135deg, #4f8ef7, #7c6af5);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            padding: 12px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 100%;
+            margin-top: 4px;
+            letter-spacing: 0.3px;
+        }
+
+        .btn-submit:hover {
+            opacity: 0.88;
+            transform: translateY(-1px);
+            box-shadow: 0 8px 24px rgba(79, 142, 247, 0.3);
+        }
+
+        .btn-submit:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .alert {
+            padding: 10px 13px;
+            border-radius: 8px;
+            font-size: 12.5px;
+            display: none;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .alert.show {
+            display: flex;
+        }
+
+        .alert-error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.25);
+            color: #fca5a5;
+        }
+
+        .alert-success {
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.25);
+            color: #86efac;
+        }
+
+        .card-footer {
+            padding: 0 36px 24px;
+            text-align: center;
+        }
+
+        .footer-text {
+            font-size: 11px;
+            color: var(--text3);
+        }
+
+        .footer-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            margin-top: 8px;
+            font-size: 10px;
+            color: var(--text3);
+            font-family: 'DM Mono', monospace;
+        }
+
+        .dot {
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: var(--green);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.3;
+            }
+        }
+
+        .spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top: 2px solid #fff;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            display: inline-block;
+            margin-right: 6px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .examples {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px 12px;
+            font-size: 11px;
+            color: var(--text3);
+            font-family: 'DM Mono', monospace;
+            line-height: 1.8;
+        }
+
+        .examples strong {
+            color: var(--accent);
+            display: block;
+            margin-bottom: 4px;
+            font-size: 10px;
+            letter-spacing: 0.5px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                <div class="logo">
+                    <div class="logo-icon">🩺</div>
+                    <div class="logo-text">MedMentor</div>
+                </div>
+                <div class="card-title">Medical Student Portal</div>
+                <div class="card-subtitle">AI Clinical Tutor — For Medical College Students Only</div>
+            </div>
+            <div style="padding:16px 36px 0">
+                <div class="tabs">
+                    <button class="tab active" onclick="switchTab('login')">Login</button>
+                    <button class="tab" onclick="switchTab('register')">Register</button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="alert" id="alert"></div>
+                <form class="form active" id="loginForm" onsubmit="handleLogin(event)">
+                    <div class="form-group">
+                        <label>College Email</label>
+                        <input class="input" type="email" id="loginEmail" placeholder="you@college.ac.in" required />
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <div class="pw-wrap">
+                            <input class="input" type="password" id="loginPassword" placeholder="Enter your password"
+                                required />
+                            <button type="button" class="pw-eye" onclick="togglePw('loginPassword',this)">👁</button>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-submit" id="loginBtn">Login to MedMentor</button>
+                </form>
+                <form class="form" id="registerForm" onsubmit="handleRegister(event)">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Full Name</label>
+                            <input class="input" type="text" id="regName" placeholder="Dr. Rohan Kumar" required />
+                        </div>
+                        <div class="form-group">
+                            <label>Course</label>
+                            <select class="input" id="regCourse" required>
+                                <option value="">Select course</option>
+                                <option>MBBS</option>
+                                <option>MD</option>
+                                <option>MS</option>
+                                <option>BDS</option>
+                                <option>MDS</option>
+                                <option>BAMS</option>
+                                <option>BHMS</option>
+                                <option>B.Pharm</option>
+                                <option>M.Pharm</option>
+                                <option>B.Sc Nursing</option>
+                                <option>M.Sc Nursing</option>
+                                <option>BPT</option>
+                                <option>MPT</option>
+                                <option>BMLT</option>
+                                <option>B.Sc Medical</option>
+                                <option>Other Medical Course</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Medical College Name</label>
+                        <input class="input" type="text" id="regCollege"
+                            placeholder="e.g. KLE Medical College, Belagavi" required />
+                    </div>
+                    <div class="form-group">
+                        <label>College Email</label>
+                        <input class="input" type="email" id="regEmail" placeholder="you@college.ac.in"
+                            oninput="checkEmail(this)" required />
+                        <div class="email-hint" id="emailHint">Use your official college email address</div>
+                    </div>
+                    <div class="examples">
+                        <strong>✅ ALLOWED EMAILS</strong>
+                        rohan@kletech.ac.in · student@aiims.edu<br>
+                        name@manipal.edu · id@jipmer.edu.in
+                        <br><br>
+                        <strong style="color:#fca5a5">❌ NOT ALLOWED</strong>
+                        @gmail.com · @yahoo.com · @hotmail.com
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <div class="pw-wrap">
+                            <input class="input" type="password" id="regPassword" placeholder="Min 6 characters"
+                                required />
+                            <button type="button" class="pw-eye" onclick="togglePw('regPassword',this)">👁</button>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-submit" id="registerBtn">Create My Account</button>
+                </form>
+            </div>
+            <div class="card-footer">
+                <div class="footer-text">🔒 Only verified medical college students can access MedMentor</div>
+                <div class="footer-badge"><span class="dot" id="adminDot" title=""></span>MCP · FHIR R4 · Groq AI · RxNorm</div>
+            </div>
+        </div>
+    </div>
+    <script>
+        function switchTab(tab) {
+            document.getElementById('loginForm').classList.toggle('active', tab === 'login');
+            document.getElementById('registerForm').classList.toggle('active', tab === 'register');
+            document.querySelectorAll('.tab').forEach((t, i) => {
+                t.classList.toggle('active', (tab === 'login' && i === 0) || (tab === 'register' && i === 1));
+            });
+            hideAlert();
+        }
+        function showAlert(msg, type = 'error') {
+            const el = document.getElementById('alert');
+            el.className = `alert alert-${type} show`;
+            el.innerHTML = `${type === 'error' ? '❌' : '✅'} ${msg}`;
+        }
+        function hideAlert() { document.getElementById('alert').classList.remove('show'); }
+        function togglePw(id, btn) {
+            const input = document.getElementById(id);
+            input.type = input.type === 'password' ? 'text' : 'password';
+            btn.textContent = input.type === 'password' ? '👁' : '🙈';
+        }
+        function checkEmail(input) {
+            const email = input.value.toLowerCase();
+            const hint = document.getElementById('emailHint');
+            const personal = ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'rediffmail.com', 'icloud.com'];
+            const domain = email.split('@')[1] || '';
+            if (!email.includes('@')) {
+                hint.className = 'email-hint';
+                hint.textContent = 'Use your official college email address';
+                input.className = 'input'; return;
+            }
+            if (personal.includes(domain)) {
+                hint.className = 'email-hint invalid';
+                hint.textContent = '❌ Personal emails not allowed. Use college email.';
+                input.className = 'input error';
+            } else if (domain.endsWith('.ac.in') || domain.endsWith('.edu') || domain.endsWith('.edu.in')) {
+                hint.className = 'email-hint valid';
+                hint.textContent = '✅ Valid medical college email!';
+                input.className = 'input success';
+            } else {
+                hint.className = 'email-hint invalid';
+                hint.textContent = '❌ Must be a .ac.in or .edu college email';
+                input.className = 'input error';
+            }
+        }
+        async function handleLogin(e) {
+            e.preventDefault(); hideAlert();
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            const btn = document.getElementById('loginBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span>Logging in...';
+            try {
+                const res = await fetch('http://localhost:8000/auth/login', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    localStorage.setItem('mm_token', data.token);
+                    localStorage.setItem('mm_student', JSON.stringify(data.student));
+                    if (data.session_id) localStorage.setItem('mm_session_id', data.session_id);
+                    showAlert(data.message, 'success');
+                    setTimeout(() => { window.location.href = '/app'; }, 1000);
+                } else { showAlert(data.message, 'error'); }
+            } catch (err) {
+                showAlert('Cannot connect to server. Make sure bridge.py is running!', 'error');
+            }
+            btn.disabled = false;
+            btn.innerHTML = 'Login to MedMentor';
+        }
+        async function handleRegister(e) {
+            e.preventDefault(); hideAlert();
+            const full_name = document.getElementById('regName').value.trim();
+            const course = document.getElementById('regCourse').value;
+            const college = document.getElementById('regCollege').value.trim();
+            const email = document.getElementById('regEmail').value.trim();
+            const password = document.getElementById('regPassword').value;
+            const btn = document.getElementById('registerBtn');
+            const personal = ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'rediffmail.com'];
+            const domain = email.split('@')[1] || '';
+            if (personal.includes(domain)) {
+                showAlert('Personal emails not allowed. Use your college email.', 'error'); return;
+            }
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span>Creating account...';
+            try {
+                const res = await fetch('http://localhost:8000/auth/register', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ full_name, email, password, college, course })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    localStorage.setItem('mm_token', data.token);
+                    localStorage.setItem('mm_student', JSON.stringify(data.student));
+                    if (data.session_id) localStorage.setItem('mm_session_id', data.session_id);
+                    showAlert(data.message, 'success');
+                    setTimeout(() => { window.location.href = '/app'; }, 1000);
+                } else { showAlert(data.message, 'error'); }
+            } catch (err) {
+                showAlert('Cannot connect to server. Make sure bridge.py is running!', 'error');
+            }
+            btn.disabled = false;
+            btn.innerHTML = 'Create My Account';
+        }
+        (function () {
+            const token = localStorage.getItem('mm_token');
+            if (token) {
+                fetch('http://localhost:8000/auth/verify', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                }).then(r => r.json()).then(data => {
+                    if (data.valid) window.location.href = '/app';
+                }).catch(() => { });
+            }
+        })();
+
+        // Secret admin shortcut — click the green blinking dot once
+        document.getElementById('adminDot').addEventListener('click', function(e) {
+            e.stopPropagation();
+            window.location.href = '/app/admin.html';
+        });
+    </script>
+</body>
+
+</html>

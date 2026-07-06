@@ -1,920 +1,1181 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>MedMentor — AI Clinical Tutor</title>
-<link href="https://fonts.googleapis.com/css2?family=Tiempos+Text:ital,wght@0,400;0,500;1,400&family=Styrene+A:wght@400;500&display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600;700&family=Syne:wght@400;500;600;700&family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet"/>
 <style>
-  :root {
-    --bg: #f5f0e8;
-    --surface: #faf7f2;
-    --surface2: #f0ebe0;
-    --border: #e0d8cc;
-    --border2: #ccc4b4;
-    --accent: #c85c2a;
-    --accent2: #8b4513;
-    --green: #2d7a4f;
-    --amber: #b8860b;
-    --red: #c0392b;
-    --text: #1a1410;
-    --text2: #4a3f35;
-    --muted: #8a7a6a;
-    --user-bg: #2d2520;
-    --user-text: #f5f0e8;
-    --ai-bg: #faf7f2;
-    --font-serif: 'Crimson Pro', Georgia, serif;
-    --font-sans: 'DM Sans', system-ui, sans-serif;
-    --font-mono: 'DM Mono', monospace;
-    --sidebar-width: 280px;
-  }
+/* ── Theme Variables ────────────────────────────────────────────────── */
+:root {
+  --transition: 0.35s cubic-bezier(0.4,0,0.2,1);
+}
 
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  
-  html, body { 
-    height: 100%; 
-    background: var(--bg); 
-    color: var(--text); 
-    font-family: var(--font-sans); 
-    font-size: 15px; 
-    line-height: 1.6;
-    overflow: hidden;
-  }
+[data-theme="dark"] {
+  --bg:        #0c0e14;
+  --bg2:       #12151e;
+  --surface:   #181c28;
+  --surface2:  #1e2333;
+  --border:    rgba(255,255,255,0.07);
+  --border2:   rgba(255,255,255,0.12);
+  --accent:    #4f8ef7;
+  --accent2:   #7c6af5;
+  --green:     #22c55e;
+  --amber:     #f59e0b;
+  --text:      #f0f2f8;
+  --text2:     #9aa3b8;
+  --text3:     #5a6380;
+  --user-bg:   rgba(79,142,247,0.15);
+  --user-border: rgba(79,142,247,0.3);
+  --ai-bg:     #181c28;
+  --ai-border: rgba(255,255,255,0.07);
+  --logo-grad: linear-gradient(135deg, #4f8ef7, #7c6af5);
+  --btn-grad:  linear-gradient(135deg, #4f8ef7, #7c6af5);
+  --glow:      rgba(79,142,247,0.15);
+}
 
-  /* ── Layout ── */
-  .app { display: grid; grid-template-columns: var(--sidebar-width) 1fr; height: 100vh; }
+[data-theme="light"] {
+  --bg:        #f5f3ee;
+  --bg2:       #ede9e0;
+  --surface:   #ffffff;
+  --surface2:  #f0ece3;
+  --border:    rgba(0,0,0,0.08);
+  --border2:   rgba(0,0,0,0.14);
+  --accent:    #2563eb;
+  --accent2:   #7c3aed;
+  --green:     #16a34a;
+  --amber:     #d97706;
+  --text:      #1a1a2e;
+  --text2:     #4a5568;
+  --text3:     #9ca3af;
+  --user-bg:   #1a1a2e;
+  --user-border: #1a1a2e;
+  --ai-bg:     #ffffff;
+  --ai-border: rgba(0,0,0,0.08);
+  --logo-grad: linear-gradient(135deg, #2563eb, #7c3aed);
+  --btn-grad:  linear-gradient(135deg, #2563eb, #7c3aed);
+  --glow:      rgba(37,99,235,0.08);
+}
 
-  /* ── Sidebar ── */
-  .sidebar {
-    background: var(--surface);
-    border-right: 1px solid var(--border);
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-  }
+/* ── Reset ──────────────────────────────────────────────────────────── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;font-family:'Outfit',sans-serif;font-size:15px;line-height:1.6;overflow:hidden;background:var(--bg);color:var(--text);transition:background var(--transition),color var(--transition);}
 
-  .sidebar-top {
-    padding: 20px 16px 16px;
-    border-bottom: 1px solid var(--border);
-  }
+/* ── Layout ─────────────────────────────────────────────────────────── */
+.app{display:grid;grid-template-columns:260px 1fr;height:100vh;position:relative;}
 
-  .logo {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 16px;
-  }
+/* Background glow */
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 60% 50% at 15% 30%, var(--glow) 0%, transparent 60%);pointer-events:none;z-index:0;transition:var(--transition);}
 
-  .logo-mark {
-    width: 32px;
-    height: 32px;
-    background: var(--accent);
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 16px;
-    flex-shrink: 0;
-  }
+/* ── Sidebar ─────────────────────────────────────────────────────────── */
+.sidebar{background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:relative;z-index:1;transition:background var(--transition),border-color var(--transition);}
 
-  .logo-name {
-    font-family: var(--font-serif);
-    font-size: 20px;
-    font-weight: 600;
-    color: var(--text);
-    letter-spacing: -0.3px;
-  }
+.sidebar-header{padding:20px 18px 14px;border-bottom:1px solid var(--border);}
 
-  .logo-name span { color: var(--accent); }
+.logo{display:flex;align-items:center;gap:10px;margin-bottom:3px;}
+.logo-icon{width:32px;height:32px;background:var(--logo-grad);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.logo-text{font-family:'Syne',sans-serif;font-size:19px;font-weight:700;background:var(--logo-grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.logo-tag{font-size:10px;color:var(--text3);letter-spacing:0.8px;text-transform:uppercase;font-family:'DM Mono',monospace;}
 
-  .new-chat-btn {
-    width: 100%;
-    padding: 9px 14px;
-    background: var(--accent);
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-family: var(--font-sans);
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    transition: background 0.2s;
-  }
-  .new-chat-btn:hover { background: var(--accent2); }
+/* Theme toggle */
+.theme-toggle{position:absolute;top:18px;right:14px;width:36px;height:36px;border-radius:50%;border:1px solid var(--border2);background:var(--surface2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;transition:all 0.2s;z-index:10;}
+.theme-toggle:hover{border-color:var(--accent);transform:rotate(20deg) scale(1.05);}
 
-  /* Patient Panel */
-  .sidebar-section {
-    padding: 14px 16px 10px;
-  }
+.section-label{font-size:10px;font-weight:600;letter-spacing:1.2px;text-transform:uppercase;color:var(--text3);margin-bottom:8px;font-family:'DM Mono',monospace;}
 
-  .section-label {
-    font-size: 10px;
-    font-weight: 500;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 10px;
-  }
+.sidebar-section{padding:14px 18px 8px;}
 
-  .input-field {
-    width: 100%;
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 7px;
-    padding: 7px 10px;
-    color: var(--text);
-    font-family: var(--font-mono);
-    font-size: 12px;
-    outline: none;
-    transition: border-color 0.2s;
-    margin-bottom: 6px;
-  }
-  .input-field:focus { border-color: var(--accent); }
-  .input-field::placeholder { color: var(--muted); }
+.input-field{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:7px 11px;color:var(--text);font-family:'DM Mono',monospace;font-size:11px;width:100%;outline:none;transition:border-color 0.2s,background var(--transition);}
+.input-field:focus{border-color:var(--accent);}
+.input-field::placeholder{color:var(--text3);}
 
-  .select-field {
-    width: 100%;
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 7px;
-    padding: 7px 10px;
-    color: var(--text);
-    font-family: var(--font-sans);
-    font-size: 12px;
-    outline: none;
-    cursor: pointer;
-    margin-bottom: 8px;
-    appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%238a7a6a' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 10px center;
-  }
+.select-field{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:7px 11px;color:var(--text);font-family:'Outfit',sans-serif;font-size:12px;width:100%;outline:none;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%239aa3b8' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;transition:background var(--transition),border-color 0.2s;}
+.select-field:focus{border-color:var(--accent);}
 
-  .load-btn {
-    width: 100%;
-    padding: 8px;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 7px;
-    color: var(--text2);
-    font-family: var(--font-sans);
-    font-size: 12px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s;
-    margin-bottom: 4px;
-  }
-  .load-btn:hover { background: var(--border); color: var(--text); }
+.patient-group{display:flex;flex-direction:column;gap:7px;}
 
-  /* Quick Tools */
-  .tools-list {
-    padding: 0 16px 12px;
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-  }
+.btn{padding:8px 14px;border-radius:8px;border:none;cursor:pointer;font-family:'Outfit',sans-serif;font-size:12px;font-weight:500;transition:all 0.2s;width:100%;}
+.btn-primary{background:var(--btn-grad);color:#fff;}
+.btn-primary:hover{opacity:0.85;transform:translateY(-1px);}
+.btn-ghost{background:var(--surface2);color:var(--text2);border:1px solid var(--border);margin-top:3px;font-size:11px;}
+.btn-ghost:hover{border-color:var(--accent);color:var(--text);}
 
-  .tool-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 7px 10px;
-    border-radius: 7px;
-    cursor: pointer;
-    transition: background 0.15s;
-    font-size: 12.5px;
-    color: var(--text2);
-    border: none;
-    background: transparent;
-    text-align: left;
-    width: 100%;
-    font-family: var(--font-sans);
-  }
-  .tool-item:hover { background: var(--surface2); color: var(--text); }
+.tools-list{display:flex;flex-direction:column;gap:5px;padding:0 18px 14px;}
+.tool-btn{display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:7px;cursor:pointer;font-size:11px;color:var(--text2);text-align:left;transition:all 0.2s;font-family:'Outfit',sans-serif;}
+.tool-btn:hover{border-color:var(--accent);color:var(--text);background:var(--bg2);}
+.tool-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
 
-  .tool-icon {
-    width: 24px;
-    height: 24px;
-    border-radius: 6px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 12px;
-    flex-shrink: 0;
-  }
+.sidebar-footer{margin-top:auto;padding:14px 18px;border-top:1px solid var(--border);font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;}
+.status-dot{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--green);margin-right:4px;animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.3;}}
 
-  /* Sidebar Footer */
-  .sidebar-footer {
-    margin-top: auto;
-    padding: 12px 16px;
-    border-top: 1px solid var(--border);
-  }
+/* User profile card in sidebar footer */
+.user-card{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;margin-bottom:10px;display:flex;align-items:center;gap:9px;}
+.user-avatar{width:32px;height:32px;background:var(--logo-grad);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.user-info{flex:1;min-width:0;}
+.user-name{font-size:12px;font-weight:600;color:var(--text);font-family:'Outfit',sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.user-course{font-size:10px;color:var(--accent);font-family:'DM Mono',monospace;}
+.logout-btn{display:flex;align-items:center;gap:6px;width:100%;padding:8px 10px;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);border-radius:8px;color:#fca5a5;font-size:11px;font-family:'Outfit',sans-serif;cursor:pointer;transition:all 0.2s;margin-bottom:8px;}
+.logout-btn:hover{background:rgba(239,68,68,0.18);border-color:rgba(239,68,68,0.4);color:#ef4444;}
 
-  .status-row {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 11px;
-    color: var(--muted);
-  }
+/* ── Chat Area ───────────────────────────────────────────────────────── */
+.chat-area{display:flex;flex-direction:column;height:100vh;overflow:hidden;position:relative;z-index:1;}
 
-  .dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: var(--green);
-    animation: pulse 2s infinite;
-    flex-shrink: 0;
-  }
-  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+.chat-header{padding:16px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--surface);backdrop-filter:blur(10px);flex-shrink:0;transition:background var(--transition),border-color var(--transition);}
 
-  /* ── Main Chat ── */
-  .chat-main {
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-    background: var(--bg);
-  }
+.chat-title{font-family:'DM Serif Display',Georgia,serif;font-size:17px;color:var(--text);}
+.chat-title em{color:var(--accent);font-style:italic;}
 
-  /* Top bar */
-  .topbar {
-    padding: 14px 28px;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: var(--surface);
-    flex-shrink: 0;
-  }
+.badges{display:flex;gap:6px;align-items:center;}
+.badge{padding:2px 9px;border-radius:20px;font-size:10px;font-weight:500;letter-spacing:0.3px;font-family:'DM Mono',monospace;}
+.b-blue{background:rgba(79,142,247,0.12);color:#93c5fd;border:1px solid rgba(79,142,247,0.25);}
+.b-cyan{background:rgba(6,182,212,0.12);color:#67e8f9;border:1px solid rgba(6,182,212,0.25);}
+.b-green{background:rgba(34,197,94,0.12);color:#86efac;border:1px solid rgba(34,197,94,0.25);}
 
-  .topbar-title {
-    font-family: var(--font-serif);
-    font-size: 17px;
-    color: var(--text);
-    font-weight: 400;
-  }
-  .topbar-title em { color: var(--accent); }
+/* Theme badge — changes with mode */
+[data-theme="light"] .b-blue{background:rgba(37,99,235,0.1);color:#1d4ed8;border:1px solid rgba(37,99,235,0.2);}
+[data-theme="light"] .b-cyan{background:rgba(6,182,212,0.1);color:#0e7490;border:1px solid rgba(6,182,212,0.2);}
+[data-theme="light"] .b-green{background:rgba(22,163,74,0.1);color:#15803d;border:1px solid rgba(22,163,74,0.2);}
 
-  .topbar-chips {
-    display: flex;
-    gap: 6px;
-  }
+/* ── Messages ────────────────────────────────────────────────────────── */
+.messages{flex:1;overflow-y:auto;padding:24px;display:flex;flex-direction:column;gap:0;scroll-behavior:smooth;}
+.messages::-webkit-scrollbar{width:4px;}
+.messages::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px;}
 
-  .chip {
-    padding: 3px 10px;
-    border-radius: 20px;
-    font-size: 11px;
-    font-weight: 500;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    color: var(--text2);
-  }
-  .chip.active { background: var(--accent); border-color: var(--accent); color: white; }
+/* Welcome */
+.welcome{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;text-align:center;padding:40px;gap:14px;}
+.welcome-icon{width:60px;height:60px;background:var(--logo-grad);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:26px;margin-bottom:6px;box-shadow:0 8px 32px var(--glow);}
+.welcome h2{font-family:'DM Serif Display',Georgia,serif;font-size:24px;color:var(--text);}
+.welcome p{color:var(--text2);font-size:13px;max-width:380px;line-height:1.7;}
+.quick-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px;width:100%;max-width:460px;}
+.quick-btn{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:11px 13px;color:var(--text);font-size:12px;cursor:pointer;text-align:left;transition:all 0.2s;font-family:'Outfit',sans-serif;}
+.quick-btn:hover{border-color:var(--accent);background:var(--surface2);transform:translateY(-1px);}
+.quick-icon{font-size:15px;display:block;margin-bottom:3px;}
 
-  /* Messages */
-  .messages {
-    flex: 1;
-    overflow-y: auto;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    scroll-behavior: smooth;
-  }
-  .messages::-webkit-scrollbar { width: 4px; }
-  .messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+/* Messages */
+.msg{display:flex;width:100%;animation:msgIn 0.3s ease;}
+@keyframes msgIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
 
-  /* Welcome screen */
-  .welcome {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    flex: 1;
-    min-height: 100%;
-    padding: 60px 40px;
-    text-align: center;
-    gap: 20px;
-  }
+/* AI message row */
+.msg-ai{background:var(--ai-bg);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:22px 24px;gap:14px;transition:background var(--transition);}
+.msg-ai:first-of-type{border-top:none;}
 
-  .welcome-symbol {
-    width: 56px;
-    height: 56px;
-    background: var(--accent);
-    border-radius: 14px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 26px;
-    margin-bottom: 4px;
-  }
+/* User message bubble */
+.msg-user{justify-content:flex-end;padding:14px 0;background:transparent;}
 
-  .welcome h1 {
-    font-family: var(--font-serif);
-    font-size: 28px;
-    font-weight: 600;
-    color: var(--text);
-    letter-spacing: -0.5px;
-  }
+.avatar{width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;margin-top:3px;}
+.avatar-ai{background:transparent;}
+@keyframes spinLogo{from{transform:rotateY(0deg);}to{transform:rotateY(360deg);}}
+.avatar-ai.thinking{animation:spinLogo 1.5s linear infinite;transform-style:preserve-3d;}
+.av-user{background:var(--surface2);border:1px solid var(--border2);}
 
-  .welcome p {
-    color: var(--muted);
-    font-size: 15px;
-    max-width: 440px;
-    line-height: 1.7;
-  }
+.bubble{padding:11px 15px;border-radius:12px;max-width:70%;}
+.bubble-user{
+  background:var(--user-bg);border:1px solid var(--user-border);
+  color:var(--text);border-radius:12px;border-top-right-radius:3px;
+  font-family:'Inter',sans-serif;font-size:14px;line-height:1.65;
+  font-weight:400;letter-spacing:0.01em;
+}
+[data-theme="light"] .bubble-user{color:#fff;}
 
-  .suggestion-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-    margin-top: 8px;
-    width: 100%;
-    max-width: 520px;
-  }
+/* ── AI Prose (Claude-style rich typography) ─────────────────────── */
+.bubble-ai{
+  background:transparent;color:var(--text);flex:1;
+  font-family:'Lora',Georgia,serif;
+  font-size:15px;
+  line-height:1.85;
+  letter-spacing:0.01em;
+  font-weight:400;
+}
 
-  .suggestion {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 12px 14px;
-    cursor: pointer;
-    text-align: left;
-    transition: all 0.15s;
-    font-family: var(--font-sans);
-    color: var(--text2);
-  }
-  .suggestion:hover {
-    border-color: var(--accent);
-    color: var(--text);
-    background: var(--surface2);
-    transform: translateY(-1px);
-  }
-  .suggestion-icon { font-size: 18px; display: block; margin-bottom: 6px; }
-  .suggestion-text { font-size: 13px; line-height: 1.4; }
+/* Headings inside AI bubble */
+.bubble-ai .md-h1{font-family:'Syne',sans-serif;font-size:20px;font-weight:700;color:var(--text);margin:18px 0 10px;line-height:1.3;border-bottom:1px solid var(--border);padding-bottom:6px;}
+.bubble-ai .md-h2{font-family:'Syne',sans-serif;font-size:17px;font-weight:700;color:var(--text);margin:16px 0 8px;line-height:1.35;}
+.bubble-ai .md-h3{font-family:'Syne',sans-serif;font-size:15px;font-weight:600;color:var(--accent);margin:14px 0 6px;}
 
-  /* Message rows */
-  .msg-row {
-    padding: 20px 0;
-    animation: fadeUp 0.25s ease;
-    border-bottom: 1px solid var(--border);
-  }
-  .msg-row:last-child { border-bottom: none; }
-  @keyframes fadeUp { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+/* Paragraph spacing */
+.bubble-ai .md-p{margin:0 0 12px;}
+.bubble-ai .md-p:last-child{margin-bottom:0;}
 
-  .msg-row.user { background: var(--user-bg); }
-  .msg-row.ai { background: var(--surface); }
+/* Bold and italic */
+.bubble-ai strong,.bubble-ai b{font-weight:700;color:var(--text);font-style:normal;}
+.bubble-ai em,.bubble-ai i{color:var(--text2);font-style:italic;}
 
-  .msg-inner {
-    max-width: 720px;
-    margin: 0 auto;
-    padding: 0 28px;
-    display: flex;
-    gap: 14px;
-    align-items: flex-start;
-  }
+/* Inline code */
+.bubble-ai .md-code{
+  font-family:'DM Mono',monospace;font-size:12.5px;
+  background:rgba(79,142,247,0.1);color:var(--accent);
+  border:1px solid rgba(79,142,247,0.2);
+  border-radius:4px;padding:1px 6px;
+}
+[data-theme="light"] .bubble-ai .md-code{background:rgba(37,99,235,0.08);color:#1d4ed8;}
 
-  .avatar {
-    width: 28px;
-    height: 28px;
-    border-radius: 6px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 13px;
-    flex-shrink: 0;
-    margin-top: 2px;
-  }
-  .avatar.user { background: #5a4a3a; }
-  .avatar.ai { background: var(--accent); }
+/* Code block */
+.bubble-ai .md-pre{
+  background:var(--surface2);border:1px solid var(--border2);
+  border-radius:8px;padding:14px 16px;margin:12px 0;
+  overflow-x:auto;
+}
+.bubble-ai .md-pre code{
+  font-family:'DM Mono',monospace;font-size:12.5px;
+  color:var(--text);line-height:1.6;white-space:pre;
+}
 
-  .msg-content {
-    flex: 1;
-    font-size: 14.5px;
-    line-height: 1.75;
-  }
+/* Blockquote — Claude-style left border */
+.bubble-ai .md-bq{
+  border-left:3px solid var(--accent);
+  margin:12px 0;padding:8px 14px;
+  background:rgba(79,142,247,0.05);
+  border-radius:0 6px 6px 0;
+  color:var(--text2);
+  font-style:italic;
+}
+[data-theme="light"] .bubble-ai .md-bq{background:rgba(37,99,235,0.05);}
 
-  .msg-content.user-text { color: #e8ddd0; font-size: 14.5px; }
-  .msg-content.ai-text { color: var(--text); }
+/* Lists */
+.bubble-ai .md-ul,.bubble-ai .md-ol{margin:8px 0 12px 0;padding-left:24px;}
+.bubble-ai .md-ul{list-style:none;padding-left:0;}
+.bubble-ai .md-ul li{position:relative;padding-left:20px;margin-bottom:5px;line-height:1.75;}
+.bubble-ai .md-ul li::before{content:'•';position:absolute;left:4px;color:var(--accent);font-weight:700;}
+.bubble-ai .md-ol{list-style:decimal;}
+.bubble-ai .md-ol li{margin-bottom:5px;line-height:1.75;padding-left:4px;}
 
-  .msg-content strong { color: var(--accent2); font-weight: 600; }
-  .msg-content em { color: var(--accent); }
+/* Horizontal rule */
+.bubble-ai .md-hr{border:none;border-top:1px solid var(--border2);margin:16px 0;}
 
-  .msg-sender {
-    font-size: 11px;
-    font-weight: 500;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-    margin-bottom: 6px;
-  }
-  .msg-row.user .msg-sender { color: #8a7a6a; }
-  .msg-row.ai .msg-sender { color: var(--muted); }
+/* Warning / tool result colored spans */
+.bubble-ai .md-warn{color:#fbbf24;}
+.bubble-ai .md-ok{color:var(--green);}
+.bubble-ai .md-em-block{color:var(--text3);font-style:italic;display:block;margin:4px 0;}
 
-  /* Typing */
-  .typing-dots {
-    display: flex;
-    gap: 4px;
-    padding: 4px 0;
-  }
-  .typing-dots span {
-    width: 6px; height: 6px;
-    background: var(--muted);
-    border-radius: 50%;
-    animation: bounce 1.2s infinite;
-  }
-  .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
-  .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
-  @keyframes bounce { 0%,80%,100%{transform:translateY(0)} 40%{transform:translateY(-6px);background:var(--accent)} }
+.msg-meta{font-size:10px;color:var(--text3);margin-top:8px;font-family:'DM Mono',monospace;}
+.msg-user .msg-meta{text-align:right;padding-right:2px;}
 
-  /* Tool indicator */
-  .tool-call {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 5px 10px;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    font-size: 11.5px;
-    color: var(--muted);
-    font-family: var(--font-mono);
-    animation: shimmer 1.5s infinite;
-    margin-bottom: 8px;
-  }
-  @keyframes shimmer { 0%,100%{opacity:1} 50%{opacity:0.5} }
+.ai-badge{display:inline-flex;align-items:center;gap:3px;font-size:9px;background:rgba(79,142,247,0.1);border:1px solid rgba(79,142,247,0.2);border-radius:4px;padding:1px 5px;color:var(--accent);margin-top:3px;font-family:'DM Mono',monospace;}
 
-  /* Input area */
-  .input-area {
-    padding: 16px 28px 20px;
-    border-top: 1px solid var(--border);
-    background: var(--surface);
-    flex-shrink: 0;
-  }
+/* Typing */
+.typing-wrap{display:flex;gap:14px;padding:16px 24px;background:var(--ai-bg);border-top:1px solid var(--border);}
+.typing{display:flex;gap:3px;align-items:center;padding:10px 12px;}
+.typing span{width:5px;height:5px;background:var(--text3);border-radius:50%;animation:bounce 1.2s infinite;}
+.typing span:nth-child(2){animation-delay:0.2s;}
+.typing span:nth-child(3){animation-delay:0.4s;}
+@keyframes bounce{0%,80%,100%{transform:translateY(0);}40%{transform:translateY(-5px);background:var(--accent);}}
 
-  .input-box {
-    max-width: 720px;
-    margin: 0 auto;
-  }
+/* Tool indicator */
+.tool-indicator{display:flex;align-items:center;gap:7px;padding:7px 12px;background:rgba(79,142,247,0.06);border:1px solid rgba(79,142,247,0.15);border-radius:7px;font-size:11px;color:var(--accent);font-family:'DM Mono',monospace;animation:shimmer 1.5s infinite;margin:8px 24px;}
+@keyframes shimmer{0%,100%{opacity:1;}50%{opacity:0.5;}}
 
-  .input-wrap {
-    display: flex;
-    gap: 8px;
-    align-items: flex-end;
-    background: var(--bg);
-    border: 1.5px solid var(--border2);
-    border-radius: 12px;
-    padding: 10px 12px;
-    transition: border-color 0.2s;
-  }
-  .input-wrap:focus-within { border-color: var(--accent); }
+/* ── Input ───────────────────────────────────────────────────────────── */
+.input-area{padding:14px 24px 18px;border-top:1px solid var(--border);background:var(--surface);flex-shrink:0;transition:background var(--transition),border-color var(--transition);}
+.input-row{display:flex;gap:8px;align-items:flex-end;background:var(--surface2);border:1px solid var(--border2);border-radius:12px;padding:9px 12px;transition:border-color 0.2s,background var(--transition);}
+.input-row:focus-within{border-color:var(--accent);}
+#msgInput{flex:1;background:transparent;border:none;outline:none;color:var(--text);font-family:'Outfit',sans-serif;font-size:13.5px;resize:none;max-height:110px;min-height:20px;line-height:1.5;}
+#msgInput::placeholder{color:var(--text3);}
+.send-btn{width:32px;height:32px;background:var(--btn-grad);border:none;border-radius:7px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;flex-shrink:0;}
+.send-btn:hover{opacity:0.85;transform:scale(1.05);}
+.send-btn:disabled{opacity:0.35;cursor:not-allowed;transform:none;}
+.send-btn svg{width:14px;height:14px;fill:white;}
+.input-hint{font-size:10px;color:var(--text3);margin-top:6px;text-align:center;font-family:'DM Mono',monospace;}
+.input-hint kbd{background:var(--surface2);border:1px solid var(--border2);border-radius:3px;padding:0 4px;font-size:9px;}
 
-  #msgInput {
-    flex: 1;
-    background: transparent;
-    border: none;
-    outline: none;
-    color: var(--text);
-    font-family: var(--font-sans);
-    font-size: 14px;
-    resize: none;
-    max-height: 120px;
-    min-height: 22px;
-    line-height: 1.5;
-  }
-  #msgInput::placeholder { color: var(--muted); }
+/* ── Language Selector ─────────────────────────────────────────────── */
+.lang-selector-section { padding: 14px 18px 8px; }
+.lang-select-row { display: flex; gap: 6px; align-items: center; }
+.lang-select-icon { font-size: 16px; flex-shrink: 0; }
+.lang-badge-header {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 3px 10px; border-radius: 20px; font-size: 10px; font-weight: 600;
+  font-family: 'DM Mono', monospace; letter-spacing: 0.3px;
+  background: rgba(79,142,247,0.12); color: #93c5fd;
+  border: 1px solid rgba(79,142,247,0.25);
+  transition: all 0.3s ease;
+}
+.lang-badge-header.hindi {
+  background: rgba(255,153,51,0.12); color: #ffa733;
+  border: 1px solid rgba(255,153,51,0.3);
+}
+.lang-badge-header.kannada {
+  background: rgba(34,197,94,0.12); color: #86efac;
+  border: 1px solid rgba(34,197,94,0.3);
+}
 
-  .send-btn {
-    width: 32px; height: 32px;
-    background: var(--accent);
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s;
-    flex-shrink: 0;
-  }
-  .send-btn:hover { background: var(--accent2); }
-  .send-btn:disabled { opacity: 0.35; cursor: not-allowed; }
-  .send-btn svg { width: 15px; height: 15px; fill: white; }
+/* ── Mic Button ─────────────────────────────────────────────────────── */
+.mic-btn {
+  width: 32px; height: 32px; border: 1px solid var(--border2);
+  border-radius: 7px; cursor: pointer; display: flex;
+  align-items: center; justify-content: center;
+  font-size: 14px; flex-shrink: 0;
+  background: var(--surface2);
+  transition: all 0.2s;
+}
+.mic-btn:hover { border-color: var(--accent); transform: scale(1.05); }
+.mic-btn.recording {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: #ef4444;
+  animation: micPulse 1s ease-in-out infinite;
+}
+@keyframes micPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0.4); }
+  50%       { box-shadow: 0 0 0 6px rgba(239,68,68,0); }
+}
 
-  .input-hint {
-    text-align: center;
-    font-size: 11px;
-    color: var(--muted);
-    margin-top: 8px;
-  }
-  .input-hint kbd {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 3px;
-    padding: 1px 5px;
-    font-family: var(--font-mono);
-    font-size: 10px;
-  }
+/* ── Speaker button on AI messages ───────────────────────────────────── */
+.speak-btn {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 2px 8px; border-radius: 5px; border: 1px solid var(--border2);
+  background: var(--surface2); color: var(--text3);
+  font-size: 10px; cursor: pointer; margin-top: 6px;
+  font-family: 'DM Mono', monospace;
+  transition: all 0.2s;
+}
+.speak-btn:hover { border-color: var(--accent); color: var(--accent); }
+.speak-btn.speaking { color: var(--green); border-color: var(--green); animation: shimmer 1.5s infinite; }
 
-  /* Tool result formatting */
-  .tool-result {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 12px 14px;
-    font-family: var(--font-mono);
-    font-size: 12.5px;
-    color: var(--text2);
-    line-height: 1.7;
-    margin-bottom: 4px;
-  }
-  .tool-result .warn { color: var(--red); font-weight: 500; }
-  .tool-result .ok { color: var(--green); }
-  .tool-result .label { color: var(--accent2); font-weight: 500; }
-
-  /* Divider in sidebar */
-  .sidebar-divider {
-    height: 1px;
-    background: var(--border);
-    margin: 4px 16px;
-  }
+/* ── Voice recording status overlay ─────────────────────────────────── */
+#voiceStatus {
+  display: none; align-items: center; gap: 8px;
+  padding: 8px 12px; margin: 0 24px 8px;
+  background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.25);
+  border-radius: 8px; font-size: 11px; color: #fca5a5;
+  font-family: 'DM Mono', monospace;
+}
+#voiceStatus.active { display: flex; }
+#voiceStatus .rec-dot {
+  width: 8px; height: 8px; border-radius: 50%; background: #ef4444;
+  animation: micPulse 1s infinite;
+}
 </style>
 </head>
 <body>
 <div class="app">
 
-  <!-- ── Sidebar ── -->
+  <!-- ── SIDEBAR ── -->
   <aside class="sidebar">
-    <div class="sidebar-top">
+    <div class="sidebar-header">
       <div class="logo">
-        <div class="logo-mark">🩺</div>
-        <div class="logo-name">Med<span>Mentor</span></div>
+        <div class="logo-icon">🩺</div>
+        <div class="logo-text">MedMentor</div>
       </div>
-      <button class="new-chat-btn" onclick="clearChat()">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        New session
-      </button>
+      <div class="logo-tag">AI Clinical Tutor · Groq Powered</div>
+      <!-- Theme Toggle Button -->
+      <button class="theme-toggle" onclick="toggleTheme()" title="Switch theme" id="themeBtn">🌙</button>
     </div>
 
     <div class="sidebar-section">
-      <div class="section-label">Patient</div>
-      <input class="input-field" id="patientId" placeholder="Patient ID (e.g. 592905)" value="592905"/>
-      <select class="select-field" id="difficulty">
-        <option value="beginner">Beginner</option>
-        <option value="intermediate" selected>Intermediate</option>
-        <option value="advanced">Advanced</option>
-      </select>
-      <button class="load-btn" onclick="loadPatient()">Load Patient Case</button>
+      <div class="section-label">Patient Context</div>
+      <div class="patient-group">
+        <input class="input-field" id="patientId" type="text" placeholder="Patient ID (e.g. example)" value="example"/>
+        <select class="select-field" id="difficulty">
+          <option value="beginner">Beginner</option>
+          <option value="intermediate" selected>Intermediate</option>
+          <option value="advanced">Advanced</option>
+        </select>
+        <button class="btn btn-primary" onclick="loadPatient()">Load Patient Case</button>
+        <button class="btn btn-ghost" onclick="clearChat()">Clear Chat</button>
+      </div>
     </div>
 
-    <div class="sidebar-divider"></div>
+    <!-- Language Selector -->
+    <div class="lang-selector-section">
+      <div class="section-label">Language / भाषा / ಭಾಷೆ</div>
+      <div class="lang-select-row">
+        <span class="lang-select-icon" id="langFlag">🇬🇧</span>
+        <select class="select-field" id="languageSelect" onchange="onLanguageChange()" style="flex:1;">
+          <option value="english">🇬🇧 English</option>
+          <option value="hindi">🇮🇳 हिंदी (Hindi)</option>
+          <option value="kannada">🇮🇳 ಕನ್ನಡ (Kannada)</option>
+        </select>
+      </div>
+    </div>
 
-    <div class="sidebar-section" style="padding-bottom:6px">
+    <div class="sidebar-section">
       <div class="section-label">Quick Tools</div>
     </div>
     <div class="tools-list">
-      <button class="tool-item" onclick="quickTool('get_patient_case')">
-        <div class="tool-icon" style="background:#fde8dc">📋</div>
-        Patient Case
-      </button>
-      <button class="tool-item" onclick="quickTool('get_lab_results')">
-        <div class="tool-icon" style="background:#dceffe">🔬</div>
-        Lab Results
-      </button>
-      <button class="tool-item" onclick="quickTool('get_drug_interactions')">
-        <div class="tool-icon" style="background:#fef3dc">💊</div>
-        Drug Interactions
-      </button>
-      <button class="tool-item" onclick="quickTool('get_clinical_question')">
-        <div class="tool-icon" style="background:#dcfee8">❓</div>
-        Generate Question
-      </button>
+      <button class="tool-btn" onclick="quickTool('get_patient_case')"><div class="tool-dot" style="background:#4f8ef7"></div>Get Patient Case</button>
+      <button class="tool-btn" onclick="quickTool('get_lab_results')"><div class="tool-dot" style="background:#06b6d4"></div>Get Lab Results</button>
+      <button class="tool-btn" onclick="quickTool('get_drug_interactions')"><div class="tool-dot" style="background:#f59e0b"></div>Check Drug Interactions</button>
+      <button class="tool-btn" onclick="quickTool('get_clinical_question')"><div class="tool-dot" style="background:#22c55e"></div>Generate Question</button>
     </div>
 
     <div class="sidebar-footer">
-      <div class="status-row">
-        <div class="dot"></div>
-        <span>Groq AI · FHIR R4 · RxNorm</span>
+      <div class="user-card">
+        <div class="user-avatar">👤</div>
+        <div class="user-info">
+          <div class="user-name" id="sidebarUserName">Student</div>
+          <div class="user-course" id="sidebarUserCourse">Loading...</div>
+        </div>
       </div>
+      <button class="logout-btn" onclick="handleLogout()">
+        <span>🚪</span> Logout
+      </button>
+      <div><span class="status-dot"></span>MCP Server Connected</div>
+      <div style="margin-top:3px">Groq AI · FHIR R4 · RxNorm</div>
     </div>
   </aside>
 
-  <!-- ── Main ── -->
-  <main class="chat-main">
-    <div class="topbar">
-      <div class="topbar-title"><em>Clinical Reasoning</em> Session</div>
-      <div class="topbar-chips">
-        <span class="chip active">MCP</span>
-        <span class="chip">FHIR</span>
-        <span class="chip">Groq AI</span>
+  <!-- ── CHAT ── -->
+  <main class="chat-area">
+    <div class="chat-header">
+      <div class="chat-title">Clinical <em>Reasoning</em> Session</div>
+      <div class="badges">
+        <span class="badge b-blue">MCP</span>
+        <span class="badge b-cyan">FHIR</span>
+        <span class="badge b-green">Groq AI</span>
+        <span class="lang-badge-header" id="langBadge">🇬🇧 English</span>
       </div>
     </div>
 
     <div class="messages" id="messages">
       <div class="welcome" id="welcome">
-        <div class="welcome-symbol">🧠</div>
-        <h1>How can I help you learn today?</h1>
-        <p>Ask me anything about medicine, load a patient case, or check if medications are safe together.</p>
-        <div class="suggestion-grid">
-          <button class="suggestion" onclick="sendQuick('Load a patient case and give me the clinical summary')">
-            <span class="suggestion-icon">📋</span>
-            <span class="suggestion-text">Load a patient case</span>
-          </button>
-          <button class="suggestion" onclick="sendQuick('What are the lab results for this patient?')">
-            <span class="suggestion-icon">🔬</span>
-            <span class="suggestion-text">View lab results</span>
-          </button>
-          <button class="suggestion" onclick="sendQuick('Check drug interactions for warfarin and ibuprofen')">
-            <span class="suggestion-icon">💊</span>
-            <span class="suggestion-text">Check drug safety</span>
-          </button>
-          <button class="suggestion" onclick="sendQuick('Give me a clinical reasoning question')">
-            <span class="suggestion-icon">❓</span>
-            <span class="suggestion-text">Quiz me on this case</span>
-          </button>
+        <div class="welcome-icon">🧠</div>
+        <h2>Welcome to MedMentor</h2>
+        <p>Your free AI clinical tutor. Load a patient case or ask me anything about medicine — in simple words anyone can understand.</p>
+        <div class="quick-grid">
+          <button class="quick-btn" onclick="sendQuick('Load a patient case and give me the clinical summary')"><span class="quick-icon">📋</span>Load patient case</button>
+          <button class="quick-btn" onclick="sendQuick('What are the lab results for this patient?')"><span class="quick-icon">🔬</span>View lab results</button>
+          <button class="quick-btn" onclick="sendQuick('Check drug interactions for warfarin and ibuprofen')"><span class="quick-icon">💊</span>Check drug interactions</button>
+          <button class="quick-btn" onclick="sendQuick('Give me a clinical reasoning question to test my knowledge')"><span class="quick-icon">❓</span>Get a quiz question</button>
         </div>
       </div>
     </div>
 
     <div class="input-area">
-      <div class="input-box">
-        <div class="input-wrap">
-          <textarea id="msgInput" rows="1"
-            placeholder="Ask anything about medicine..."
-            onkeydown="handleKey(event)"
-            oninput="autoResize(this)"></textarea>
-          <button class="send-btn" id="sendBtn" onclick="sendMessage()">
-            <svg viewBox="0 0 24 24"><path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/></svg>
-          </button>
-        </div>
-        <div class="input-hint"><kbd>Enter</kbd> to send · <kbd>Shift+Enter</kbd> new line · Powered by Groq AI</div>
+      <!-- Voice recording status indicator -->
+      <div id="voiceStatus">
+        <div class="rec-dot"></div>
+        <span id="voiceStatusText">Listening... speak now</span>
       </div>
+      <div class="input-row">
+        <textarea id="msgInput" rows="1" placeholder="Ask anything — diseases, medicines, patient cases..." onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+        <button class="mic-btn" id="micBtn" onclick="toggleRecording()" title="Voice input (🎤)" aria-label="Start voice recording">🎤</button>
+        <button class="send-btn" id="sendBtn" onclick="sendMessage()">
+          <svg viewBox="0 0 24 24"><path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/></svg>
+        </button>
+      </div>
+      <div class="input-hint"><kbd>Enter</kbd> send · <kbd>Shift+Enter</kbd> new line · 🎤 Voice: Chrome/Edge · Groq AI powered</div>
     </div>
   </main>
 </div>
 
 <script>
+// ── Theme Toggle ───────────────────────────────────────────────────────
+const THEME_KEY    = 'medmentor-theme';
+const LANGUAGE_KEY = 'mm_language';
+
+// Current language state
+let currentLanguage = localStorage.getItem(LANGUAGE_KEY) || 'english';
+
+function toggleTheme() {
+  const html  = document.documentElement;
+  const btn   = document.getElementById('themeBtn');
+  const isDark = html.getAttribute('data-theme') === 'dark';
+  const next  = isDark ? 'light' : 'dark';
+  html.setAttribute('data-theme', next);
+  btn.textContent = next === 'dark' ? '🌙' : '☀️';
+  localStorage.setItem(THEME_KEY, next);
+}
+
+// Restore saved theme
+(function() {
+  const saved = localStorage.getItem(THEME_KEY) || 'dark';
+  document.documentElement.setAttribute('data-theme', saved);
+  document.getElementById('themeBtn').textContent = saved === 'dark' ? '🌙' : '☀️';
+})();
+
+// ── Language System ──────────────────────────────────────────────────────────
+const LANG_META = {
+  english : { flag: '🇬🇧', badge: '🇬🇧 English',      cls: '',        speechLang: 'en-US', name: 'English',
+               welcome: 'Hello! I am <strong>MedMentor</strong> — your AI Clinical Tutor. Ask me anything about medicine! 🩺' },
+  hindi   : { flag: '🇮🇳', badge: '🇮🇳 हिंदी',          cls: 'hindi',   speechLang: 'hi-IN', name: 'हिंदी',
+               welcome: 'नमस्ते! मैं <strong>MedMentor</strong> हूं — आपका AI क्लिनिकल ट्यूटर। आप हिंदी में प्रश्न पूछ सकते हैं। 🩺' },
+  kannada : { flag: '🇮🇳', badge: '🇮🇳 ಕನ್ನಡ',          cls: 'kannada', speechLang: 'kn-IN', name: 'ಕನ್ನಡ',
+               welcome: 'ನಮಸ್ಕಾರ! ನಾನು <strong>MedMentor</strong> — ನಿಮ್ಮ AI ಕ್ಲಿನಿಕಲ್ ಟ್ಯೂಟರ್. ನೀವು ಕನ್ನಡದಲ್ಲಿ ಪ್ರಶ್ನೆಗಳನ್ನು ಕೇಳಬಹುದು. 🩺' }
+};
+
+function applyLanguageUI(lang) {
+  const meta   = LANG_META[lang] || LANG_META.english;
+  const badge  = document.getElementById('langBadge');
+  const select = document.getElementById('languageSelect');
+  const flag   = document.getElementById('langFlag');
+  const input  = document.getElementById('msgInput');
+
+  if (badge) {
+    badge.textContent = meta.badge;
+    badge.className   = 'lang-badge-header ' + meta.cls;
+  }
+  if (select) select.value = lang;
+  if (flag)   flag.textContent = meta.flag;
+
+  // Update placeholder text
+  if (input) {
+    const placeholders = {
+      english: 'Ask anything — diseases, medicines, patient cases...',
+      hindi:   'यहाँ टाइप करें — बीमारी, दवाई, patient case...',
+      kannada: 'ಇಲ್ಲಿ ಟೈಪ್ ಮಾಡಿ — ರೋಗ, ಔಷಧ, patient case...'
+    };
+    input.placeholder = placeholders[lang] || placeholders.english;
+  }
+}
+
+function onLanguageChange() {
+  const select = document.getElementById('languageSelect');
+  currentLanguage = select.value;
+  localStorage.setItem(LANGUAGE_KEY, currentLanguage);
+  applyLanguageUI(currentLanguage);
+  // Show language-specific welcome in chat as a soft message
+  showLanguageWelcome(currentLanguage);
+}
+
+function showLanguageWelcome(lang) {
+  if (lang === 'english') return;
+  const meta = LANG_META[lang];
+  if (!meta) return;
+  addMsg('ai', meta.welcome, true, false);
+}
+
+// Restore language preference on load
+(function() {
+  const saved = localStorage.getItem(LANGUAGE_KEY) || 'english';
+  currentLanguage = saved;
+  // Apply after DOM is ready
+  setTimeout(() => applyLanguageUI(saved), 0);
+})();
+
+// ── Auth Gate + User Info ─────────────────────────────────────────────────
+(function() {
+  const token   = localStorage.getItem('mm_token');
+  const student = JSON.parse(localStorage.getItem('mm_student') || 'null');
+  if (!token) {
+    window.location.href = '/app/login.html';
+    return;
+  }
+  // Verify token with server
+  fetch('http://localhost:8000/auth/verify', {
+    headers: { 'Authorization': 'Bearer ' + token }
+  }).then(r => r.json()).then(data => {
+    if (!data.valid) {
+      localStorage.removeItem('mm_token');
+      localStorage.removeItem('mm_student');
+      localStorage.removeItem('mm_session_id');
+      window.location.href = '/app/login.html';
+    }
+  }).catch(() => { /* allow offline usage */ });
+  // Show student info in sidebar
+  if (student) {
+    const nameEl   = document.getElementById('sidebarUserName');
+    const courseEl = document.getElementById('sidebarUserCourse');
+    if (nameEl)   nameEl.textContent   = student.name   || 'Student';
+    if (courseEl) courseEl.textContent = student.course || 'Medical Student';
+  }
+})();
+
+// ── State ──────────────────────────────────────────────────────────────
 const state = {
-  patientId: '592905',
-  difficulty: 'intermediate',
-  history: [],
-  loading: false,
+  patientId    : 'example',
+  difficulty   : 'intermediate',
+  history      : [],
+  loading      : false,
   patientSummary: null
 };
 
-// ── API Calls ──────────────────────────────────────────────────
-async function askAI(message) {
+// ── API Calls ──────────────────────────────────────────────────────────
+async function askGroq(message) {
   try {
-    const res = await fetch('http://localhost:8000/chat', {
-      method: 'POST',
+    const lang = currentLanguage || 'english';
+    const endpoint = (lang === 'hindi' || lang === 'kannada') ? '/voice/chat' : '/chat';
+    const res = await fetch('http://localhost:8000' + endpoint, {
+      method : 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
+      body   : JSON.stringify({
         message,
+        language       : lang,
         patient_context: state.patientSummary || '',
-        history: state.history.slice(-10),
-        difficulty: state.difficulty
+        history        : state.history.slice(-10),
+        difficulty     : state.difficulty
       }),
-      signal: AbortSignal.timeout(30000)
+      signal: AbortSignal.timeout(45000)
     });
-    if (res.ok) return (await res.json()).response;
+    if (res.ok) {
+      const data = await res.json();
+      return data.response || fallback(message);
+    }
   } catch(e) {}
-  return 'Please make sure bridge.py is running on port 8000.';
+  return fallback(message);
 }
 
 async function callTool(toolName, args) {
   try {
     const res = await fetch('http://localhost:8000/tool', {
-      method: 'POST',
+      method : 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ tool: toolName, arguments: args }),
-      signal: AbortSignal.timeout(12000)
+      body   : JSON.stringify({ tool: toolName, arguments: args }),
+      signal : AbortSignal.timeout(10000)
     });
-    if (res.ok) return (await res.json()).result;
+    if (res.ok) {
+      const data = await res.json();
+      return data.result;
+    }
   } catch(e) {}
-  return simulateTool(toolName);
+  return demoTool(toolName, args);
 }
 
-// ── Message Router ─────────────────────────────────────────────
-async function runTutor(userMsg) {
-  const l = userMsg.toLowerCase();
+// ── Router ─────────────────────────────────────────────────────────────
+async function runTutor(msg) {
+  const lower = msg.toLowerCase();
   let toolResult = null;
-  let toolName = null;
+  let toolName   = null;
 
-  if (l.includes('load') || l.includes('patient case') || l.includes('summary')) {
+  if (lower.includes('load') || lower.includes('patient case') || lower.includes('summary')) {
     toolName = 'get_patient_case';
-    showToolCall(toolName);
-    toolResult = await callTool(toolName, { patient_id: state.patientId });
+    showToolIndicator('get_patient_case');
+    toolResult = await callTool('get_patient_case', { patient_id: state.patientId });
     state.patientSummary = toolResult;
-  } else if (l.includes('lab') || l.includes('blood test') || l.includes('result')) {
+  } else if (lower.includes('lab result') || lower.includes('blood test') || lower.includes('lab report')) {
     toolName = 'get_lab_results';
-    showToolCall(toolName);
-    toolResult = await callTool(toolName, { patient_id: state.patientId });
-  } else if (l.includes('drug') || l.includes('interaction') || l.includes('safe')) {
-    const stop = new Set(['check','drug','interactions','interaction','medication','between','and','for','the','is','safe','please','what','are','about']);
-    const drugs = userMsg.toLowerCase().split(/\s+/).filter(w => w.length > 3 && !stop.has(w));
-    toolName = 'get_drug_interactions';
-    showToolCall(toolName);
-    toolResult = await callTool(toolName, { drug_one: drugs[0]||'warfarin', drug_two: drugs[1]||'ibuprofen' });
-  } else if (l.includes('question') || l.includes('quiz') || l.includes('test me')) {
+    showToolIndicator('get_lab_results');
+    toolResult = await callTool('get_lab_results', { patient_id: state.patientId });
+  } else if (lower.includes('drug') || lower.includes('interaction') || lower.includes('medicine safe')) {
+    const stopWords = ['check','drug','inter','interactions','interaction','medication','medications','between','and','for','the','please','what','are','tell','me','about','is','safe'];
+    const words     = lower.split(/\s+/);
+    const drugWords = words.filter(w => w.length > 3 && !stopWords.includes(w));
+    toolName        = 'get_drug_interactions';
+    showToolIndicator('get_drug_interactions');
+    toolResult = await callTool('get_drug_interactions', {
+      drug_one: drugWords[0] || 'warfarin',
+      drug_two: drugWords[1] || 'ibuprofen'
+    });
+  } else if (lower.includes('question') || lower.includes('quiz') || lower.includes('test me') || lower.includes('ask me')) {
     toolName = 'get_clinical_question';
-    showToolCall(toolName);
-    toolResult = await callTool(toolName, {
-      patient_summary: state.patientSummary || 'Patient with T2DM, Hypertension, CKD.',
+    showToolIndicator('get_clinical_question');
+    toolResult = await callTool('get_clinical_question', {
+      patient_summary: state.patientSummary || 'Patient with T2DM, Hypertension, CKD Stage 3.',
       difficulty: state.difficulty
     });
   }
 
-  await sleep(300);
-  removeToolCall();
+  await sleep(400);
+  removeToolIndicator();
 
   if (toolResult) {
     const formatted = formatTool(toolResult);
     setTimeout(async () => {
       addTyping();
-      const explanation = await askAI(`Tool returned:\n${toolResult}\n\nExplain this to the student simply and ask one follow-up question.`);
+      const explanation = await askGroq(`The FHIR tool returned:\n${toolResult}\n\nExplain this in simple language and ask one follow-up question.`);
       removeTyping();
-      addMsg('ai', explanation, false);
-      state.history.push({ role: 'ai', content: explanation });
-    }, 600);
-    return { html: formatted, isToolResult: true };
+      addMsg('ai', explanation, true, true);
+      state.history.push({ role:'ai', content: explanation });
+    }, 700);
+    return formatted;
   }
 
-  const reply = await askAI(userMsg);
-  return { text: reply, isToolResult: false };
+  return await askGroq(msg);
 }
 
-// ── UI Helpers ─────────────────────────────────────────────────
+// ── Demo fallbacks ─────────────────────────────────────────────────────
+function fallback(msg) {
+  return `Great question! Let me help you think through this clinically.<br><br><strong>Approach:</strong> Start with the primary complaint, assess vitals, review medications, then correlate with lab values.<br><br><em>💡 Make sure bridge.py is running for real Groq AI responses!</em>`;
+}
+
+function demoTool(name, args) {
+  if (name === 'get_patient_case') return "**Patient Case**\nName: John Smith\nGender: male\nDOB: 1957-04-15\n\n**Active Conditions** (3):\n  • Type 2 Diabetes Mellitus\n  • Hypertension\n  • Chronic Kidney Disease Stage 3\n\n**Medications** (4):\n  • Metformin 500mg\n  • Lisinopril 10mg\n  • Warfarin 5mg\n  • Furosemide 40mg";
+  if (name === 'get_lab_results') return "**Lab Results**\n\n  • HbA1c: 8.2 %  [2024-11-01]\n  • Serum Creatinine: 2.1 mg/dL  [2024-11-01]\n  • eGFR: 38 mL/min/1.73m²  [2024-11-01]\n  • Blood Pressure: 148/92 mmHg  [2024-11-01]\n  • INR: 2.8  [2024-11-01]";
+  if (name === 'get_drug_interactions') return "**Drug Interactions**\n\n  ⚠️  [HIGH] Warfarin + Ibuprofen may increase bleeding risk.\n  ⚠️  [MODERATE] Ibuprofen may worsen renal function in CKD.";
+  if (name === 'get_clinical_question') return "**Clinical Question** (Intermediate)\n\n❓ Given the medication list and lab results, what drug interaction risks should you assess first?\n\n_Think carefully. Consider the full clinical picture._";
+  return 'Tool unavailable.';
+}
+
+// ── UI Helpers ─────────────────────────────────────────────────────────
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+function now()     { return new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}); }
 function hideWelcome() { const w = document.getElementById('welcome'); if(w) w.remove(); }
-function now() { return new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}); }
 
-function addMsg(role, content, isHTML = false) {
+// ── Markdown Renderer (Claude-style) ───────────────────────────────────────────────
+function markdownToHTML(text) {
+  if (!text) return '';
+  const lines   = text.split('\n');
+  const out     = [];
+  let inCode    = false;
+  let codeLines = [];
+  let inOl      = false;
+  let inUl      = false;
+
+  function closeList() {
+    if (inUl) { out.push('</ul>'); inUl = false; }
+    if (inOl) { out.push('</ol>'); inOl = false; }
+  }
+
+  function inlineFmt(s) {
+    return s
+      .replace(/`([^`]+)`/g,           '<code class="md-code">$1</code>')
+      .replace(/\*\*\*(.+?)\*\*\*/g,   '<strong><em>$1</em></strong>')
+      .replace(/\*\*(.+?)\*\*/g,       '<strong>$1</strong>')
+      .replace(/__(.+?)__/g,            '<strong>$1</strong>')
+      .replace(/\*([^*\n]+)\*/g,       '<em>$1</em>')
+      .replace(/_([^_\n]+)_/g,         '<em>$1</em>')
+      .replace(/⚠️([^\n]*)/g,          '<span class="md-warn">⚠️$1</span>')
+      .replace(/✅([^\n]*)/g,           '<span class="md-ok">✅$1</span>');
+  }
+
+  for (let i = 0; i < lines.length; i++) {
+    let line = lines[i];
+    if (line.startsWith('```')) {
+      if (!inCode) { closeList(); inCode = true; codeLines = []; }
+      else {
+        inCode = false;
+        const e = codeLines.join('\n').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        out.push(`<div class="md-pre"><code>${e}</code></div>`);
+      }
+      continue;
+    }
+    if (inCode) { codeLines.push(line); continue; }
+    if (/^(-{3,}|\*{3,})$/.test(line.trim())) { closeList(); out.push('<hr class="md-hr">'); continue; }
+    if (line.startsWith('### '))  { closeList(); out.push(`<div class="md-h3">${inlineFmt(line.slice(4))}</div>`); continue; }
+    if (line.startsWith('## '))   { closeList(); out.push(`<div class="md-h2">${inlineFmt(line.slice(3))}</div>`); continue; }
+    if (line.startsWith('# '))    { closeList(); out.push(`<div class="md-h1">${inlineFmt(line.slice(2))}</div>`); continue; }
+    if (line.startsWith('> '))    { closeList(); out.push(`<blockquote class="md-bq">${inlineFmt(line.slice(2))}</blockquote>`); continue; }
+    if (/^[\-\*\+] /.test(line)) {
+      if (inOl) { out.push('</ol>'); inOl = false; }
+      if (!inUl) { out.push('<ul class="md-ul">'); inUl = true; }
+      out.push(`<li>${inlineFmt(line.slice(2))}</li>`); continue;
+    }
+    if (/^\d+\.\s/.test(line)) {
+      if (inUl) { out.push('</ul>'); inUl = false; }
+      if (!inOl) { out.push('<ol class="md-ol">'); inOl = true; }
+      out.push(`<li>${inlineFmt(line.replace(/^\d+\.\s/, ''))}</li>`); continue;
+    }
+    // Tool result bold-title lines  (**Title**)
+    if (/^\*\*[^*]+\*\*$/.test(line.trim())) {
+      closeList(); out.push(`<div class="md-h2">${line.replace(/\*\*/g,'')}</div>`); continue;
+    }
+    // Italic-only note lines
+    if (/^_[^_]+_$/.test(line.trim())) {
+      closeList(); out.push(`<em class="md-em-block">${line.replace(/_/g,'')}</em>`); continue;
+    }
+    if (line.trim() === '') { closeList(); out.push('<div style="height:8px"></div>'); continue; }
+    closeList();
+    out.push(`<p class="md-p">${inlineFmt(line)}</p>`);
+  }
+  closeList();
+  return out.join('');
+}
+
+function addMsg(role, content, isHTML=false, isAI=false) {
   const msgs = document.getElementById('messages');
-  const row = document.createElement('div');
-  row.className = `msg-row ${role}`;
+  const div  = document.createElement('div');
+  div.className = `msg msg-${role}`;
 
-  const senderLabel = role === 'ai' ? 'MedMentor' : 'You';
-  const avatarEmoji = role === 'ai' ? '🩺' : '👤';
-  const contentClass = role === 'ai' ? 'ai-text' : 'user-text';
+  if (role === 'ai') {
+    const msgId    = 'msg_' + Date.now() + '_' + Math.random().toString(36).slice(2,6);
+    const lang     = currentLanguage || 'english';
+    const langMeta = LANG_META[lang] || LANG_META.english;
+    // Always render AI content through markdown parser
+    const rendered = markdownToHTML(isHTML ? content.replace(/<br\s*\/?>/gi,'\n').replace(/<[^>]+>/g,'') : content)
+                     || (isHTML ? content : esc(content));
+    const speakBtn = (lang !== 'english')
+      ? `<button class="speak-btn" id="spk_${msgId}" onclick="speakText('${msgId}','${langMeta.speechLang}')" title="Read aloud">🔊 ${lang==='hindi'?'सुनें':'ಕೇಳಿ'}</button>`
+      : `<button class="speak-btn" id="spk_${msgId}" onclick="speakText('${msgId}','en-US')" title="Read aloud">🔊</button>`;
+    const av  = `<div class="avatar avatar-ai"><img src="logo.jpg" style="width:28px;height:28px;object-fit:contain;"/></div>`;
+    const bub = `<div class="bubble bubble-ai" id="${msgId}">${rendered}<div class="msg-meta">MedMentor · ${now()}${isAI?' <span class="ai-badge">⚡ Groq AI</span>':''}</div>${speakBtn}</div>`;
+    div.innerHTML = av + bub;
+  } else {
+    const bub = `<div><div class="bubble bubble-user">${esc(content)}</div><div class="msg-meta">You · ${now()}</div></div>`;
+    const av  = `<div class="avatar av-user">👤</div>`;
+    div.innerHTML = bub + av;
+  }
 
-  const displayContent = isHTML ? content : escHtml(content);
-
-  row.innerHTML = `
-    <div class="msg-inner">
-      <div class="avatar ${role}">${avatarEmoji}</div>
-      <div style="flex:1;min-width:0">
-        <div class="msg-sender">${senderLabel} · ${now()}</div>
-        <div class="msg-content ${contentClass}">${displayContent}</div>
-      </div>
-    </div>`;
-  msgs.appendChild(row);
+  msgs.appendChild(div);
   msgs.scrollTop = msgs.scrollHeight;
 }
 
 function addTyping() {
   const msgs = document.getElementById('messages');
-  const row = document.createElement('div');
-  row.className = 'msg-row ai'; row.id = 'typing';
-  row.innerHTML = `<div class="msg-inner">
-    <div class="avatar ai">🩺</div>
-    <div><div class="msg-sender">MedMentor</div><div class="typing-dots"><span></span><span></span><span></span></div></div>
-  </div>`;
-  msgs.appendChild(row);
+  const div  = document.createElement('div');
+  div.className = 'typing-wrap'; div.id = 'typing';
+  div.innerHTML = `<div class="avatar avatar-ai thinking"><img src="logo.jpg" style="width:28px;height:28px;object-fit:contain;"/></div><div class="typing"><span></span><span></span><span></span></div>`;
+  msgs.appendChild(div);
   msgs.scrollTop = msgs.scrollHeight;
 }
+
 function removeTyping() { const t = document.getElementById('typing'); if(t) t.remove(); }
 
-function showToolCall(name) {
+function showToolIndicator(tool) {
+  removeToolIndicator();
   const msgs = document.getElementById('messages');
-  const d = document.createElement('div');
-  d.className = 'msg-row ai'; d.id = 'toolcall';
-  d.innerHTML = `<div class="msg-inner"><div class="avatar ai">🩺</div><div><div class="tool-call">⚙ Calling ${name}...</div></div></div>`;
-  msgs.appendChild(d);
+  const div  = document.createElement('div');
+  div.id = 'toolInd'; div.className = 'tool-indicator';
+  div.innerHTML = `⚙️ Calling: ${tool}...`;
+  msgs.appendChild(div);
   msgs.scrollTop = msgs.scrollHeight;
 }
-function removeToolCall() { const t = document.getElementById('toolcall'); if(t) t.remove(); }
 
-function escHtml(s) {
-  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+function removeToolIndicator() { const t = document.getElementById('toolInd'); if(t) t.remove(); }
+
+function esc(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function autoResize(el) { el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,110)+'px'; }
+
+function formatTool(result) {
+  return result.split('\n').map(line => {
+    if (line.startsWith('**') && line.endsWith('**')) return `<strong>${line.replace(/\*\*/g,'')}</strong><br>`;
+    if (line.startsWith('  •')) return `&nbsp;&nbsp;• ${line.slice(3)}<br>`;
+    if (line.startsWith('❓')) return `<br><span style="color:var(--amber);font-size:14px">${line}</span><br>`;
+    if (line.startsWith('⚠️')) return `<span style="color:#fbbf24">${line}</span><br>`;
+    if (line.startsWith('✅')) return `<span style="color:var(--green)">${line}</span><br>`;
+    if (line.startsWith('_') && line.endsWith('_')) return `<em>${line.replace(/_/g,'')}</em><br>`;
+    if (line === '---') return `<hr style="border:none;border-top:1px solid var(--border);margin:8px 0">`;
+    return `${line}<br>`;
+  }).join('');
 }
 
-function formatTool(raw) {
-  const lines = raw.split('\n');
-  let html = '<div class="tool-result">';
-  for (const line of lines) {
-    if (line.startsWith('**') && line.endsWith('**')) {
-      html += `<div class="label">${line.replace(/\*\*/g,'')}</div>`;
-    } else if (line.includes('⚠️') || line.includes('[HIGH]') || line.includes('[MODERATE]')) {
-      html += `<div class="warn">${escHtml(line)}</div>`;
-    } else if (line.startsWith('  •')) {
-      html += `<div>${escHtml(line)}</div>`;
-    } else if (line.startsWith('❓')) {
-      html += `</div><div style="margin-top:8px;font-family:var(--font-sans);font-size:14px;color:var(--text)">${escHtml(line)}</div>`;
-    } else if (line.trim()) {
-      html += `<div>${escHtml(line)}</div>`;
-    }
-  }
-  html += '</div>';
-  return html;
-}
-
-function autoResize(el) { el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,120)+'px'; }
-
-// ── Send ───────────────────────────────────────────────────────
+// ── Send ───────────────────────────────────────────────────────────────
 async function sendMessage() {
   const input = document.getElementById('msgInput');
-  const msg = input.value.trim();
+  const msg   = input.value.trim();
   if (!msg || state.loading) return;
   hideWelcome();
   state.loading = true;
+  state.difficulty = document.getElementById('difficulty').value;
   document.getElementById('sendBtn').disabled = true;
   input.value = ''; input.style.height = 'auto';
-
   addMsg('user', msg);
   addTyping();
-
   try {
-    const { text, html, isToolResult } = await runTutor(msg);
+    const response = await runTutor(msg);
     removeTyping();
-    if (isToolResult) {
-      addMsg('ai', html, true);
-    } else {
-      addMsg('ai', text ? escHtml(text).replace(/\n/g,'<br>') : '...', true);
-    }
-    state.history.push({ role: 'user', content: msg });
+    const isAI = !response.includes('• ') && !response.includes('**Patient');
+    addMsg('ai', response, true, isAI);
+    state.history.push({ role:'user', content:msg });
+    state.history.push({ role:'ai',  content:response });
   } catch(e) {
     removeTyping();
-    addMsg('ai', '⚠️ Something went wrong. Is bridge.py running?');
+    addMsg('ai','⚠️ Something went wrong. Make sure bridge.py is running!', true);
   }
-
   state.loading = false;
   document.getElementById('sendBtn').disabled = false;
   document.getElementById('msgInput').focus();
 }
 
-function sendQuick(msg) {
-  document.getElementById('msgInput').value = msg;
-  sendMessage();
-}
-
-function handleKey(e) {
-  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
-}
+function sendQuick(msg) { document.getElementById('msgInput').value = msg; sendMessage(); }
+function handleKey(e)   { if (e.key==='Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }
 
 async function loadPatient() {
-  state.patientId = document.getElementById('patientId').value.trim() || '592905';
+  state.patientId  = document.getElementById('patientId').value.trim() || 'example';
   state.difficulty = document.getElementById('difficulty').value;
-  hideWelcome();
+  hideWelcome(); state.loading = true;
   addMsg('user', `Load patient: ${state.patientId} (${state.difficulty})`);
-  addTyping(); showToolCall('get_patient_case');
-  await sleep(400); removeToolCall();
+  addTyping(); showToolIndicator('get_patient_case');
+  await sleep(500); removeToolIndicator();
   const result = await callTool('get_patient_case', { patient_id: state.patientId });
   state.patientSummary = result;
   removeTyping();
   addMsg('ai', formatTool(result), true);
   setTimeout(async () => {
     addTyping();
-    const explain = await askAI(`Patient loaded: ${result}\n\nGreet the student warmly, summarize this patient simply, ask what to investigate first.`);
+    const exp = await askGroq(`Patient loaded:\n${result}\n\nGreet the student warmly, summarize this patient simply, and ask what to investigate first.`);
     removeTyping();
-    addMsg('ai', escHtml(explain).replace(/\n/g,'<br>'), true);
-  }, 600);
+    addMsg('ai', exp, true, true);
+  }, 700);
+  state.loading = false;
 }
 
 function quickTool(tool) {
-  const p = {
-    get_patient_case: 'Load a patient case and give me the clinical summary',
-    get_lab_results: 'What are the lab results for this patient?',
-    get_drug_interactions: 'Check drug interactions for warfarin and ibuprofen',
-    get_clinical_question: 'Give me a clinical reasoning question to test my knowledge'
+  const prompts = {
+    get_patient_case      : 'Load a patient case and give me the clinical summary',
+    get_lab_results       : 'What are the lab results for this patient?',
+    get_drug_interactions : 'Check drug interactions for warfarin and ibuprofen',
+    get_clinical_question : 'Give me a clinical reasoning question to test my knowledge'
   };
-  sendQuick(p[tool]);
+  document.getElementById('msgInput').value = prompts[tool] || '';
+  sendMessage();
 }
 
 function clearChat() {
   state.history = []; state.patientSummary = null;
   document.getElementById('messages').innerHTML = `
-  <div class="welcome" id="welcome">
-    <div class="welcome-symbol">🧠</div>
-    <h1>How can I help you learn today?</h1>
-    <p>Ask me anything about medicine, load a patient case, or check if medications are safe together.</p>
-    <div class="suggestion-grid">
-      <button class="suggestion" onclick="sendQuick('Load a patient case and give me the clinical summary')"><span class="suggestion-icon">📋</span><span class="suggestion-text">Load a patient case</span></button>
-      <button class="suggestion" onclick="sendQuick('What are the lab results for this patient?')"><span class="suggestion-icon">🔬</span><span class="suggestion-text">View lab results</span></button>
-      <button class="suggestion" onclick="sendQuick('Check drug interactions for warfarin and ibuprofen')"><span class="suggestion-icon">💊</span><span class="suggestion-text">Check drug safety</span></button>
-      <button class="suggestion" onclick="sendQuick('Give me a clinical reasoning question')"><span class="suggestion-icon">❓</span><span class="suggestion-text">Quiz me on this case</span></button>
-    </div>
-  </div>`;
+    <div class="welcome" id="welcome">
+      <div class="welcome-icon">🧠</div>
+      <h2>Welcome to MedMentor</h2>
+      <p>Your free AI clinical tutor. Load a patient case or ask me anything about medicine!</p>
+      <div class="quick-grid">
+        <button class="quick-btn" onclick="sendQuick('Load a patient case and give me the clinical summary')"><span class="quick-icon">📋</span>Load patient case</button>
+        <button class="quick-btn" onclick="sendQuick('What are the lab results for this patient?')"><span class="quick-icon">🔬</span>View lab results</button>
+        <button class="quick-btn" onclick="sendQuick('Check drug interactions for warfarin and ibuprofen')"><span class="quick-icon">💊</span>Check drug interactions</button>
+        <button class="quick-btn" onclick="sendQuick('Give me a clinical reasoning question to test my knowledge')"><span class="quick-icon">❓</span>Get a quiz question</button>
+      </div>
+    </div>`;
 }
 
-function simulateTool(n) {
-  if (n==='get_patient_case') return "**Patient Case**\nName: John Smith\nGender: male\nDOB: 1957-04-15\n\n**Active Conditions** (3):\n  • Type 2 Diabetes Mellitus\n  • Hypertension\n  • Chronic Kidney Disease Stage 3\n\n**Medications** (4):\n  • Metformin 500mg\n  • Lisinopril 10mg\n  • Warfarin 5mg\n  • Furosemide 40mg";
-  if (n==='get_lab_results') return "**Lab Results**\n\n  • HbA1c: 8.2 %  [2024-11-01]\n  • Serum Creatinine: 2.1 mg/dL  [2024-11-01]\n  • eGFR: 38 mL/min/1.73m²  [2024-11-01]\n  • Blood Pressure: 148/92 mmHg  [2024-11-01]\n  • INR: 2.8  [2024-11-01]";
-  if (n==='get_drug_interactions') return "**Drug Interactions**\n\n  ⚠️  [HIGH] Warfarin + Ibuprofen: increased bleeding risk.\n  ⚠️  [MODERATE] Ibuprofen worsens renal function in CKD.";
-  if (n==='get_clinical_question') return "**Clinical Reasoning Question**\n\n❓ Given CKD Stage 3 and INR 2.8, how would you adjust anticoagulation therapy?\n\n_Consider renal clearance, bleeding risk, and therapeutic targets._";
-  return 'Tool unavailable.';
+// ── Logout ─────────────────────────────────────────────────────────────────
+async function handleLogout() {
+  const sessionId = localStorage.getItem('mm_session_id');
+  // Call backend to mark session closed
+  if (sessionId) {
+    try {
+      await fetch('http://localhost:8000/auth/logout', {
+        method : 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body   : JSON.stringify({ session_id: parseInt(sessionId) })
+      });
+    } catch(e) { /* logout anyway even if server is down */ }
+  }
+  // Clear all local data
+  localStorage.removeItem('mm_token');
+  localStorage.removeItem('mm_student');
+  localStorage.removeItem('mm_session_id');
+  window.location.href = '/app/login.html';
 }
+
+// ── Voice Recording (Web Speech API) ──────────────────────────────────────
+let recognition   = null;
+let isRecording   = false;
+let speechSynth   = window.speechSynthesis || null;
+let currentUtter  = null;
+
+function toggleRecording() {
+  if (isRecording) {
+    stopRecording();
+  } else {
+    startRecording();
+  }
+}
+
+function startRecording() {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) {
+    addMsg('ai', '⚠️ Voice input is not supported in this browser. Please use Chrome or Edge. 🎤', true);
+    return;
+  }
+
+  const lang   = currentLanguage || 'english';
+  const meta   = LANG_META[lang] || LANG_META.english;
+
+  recognition = new SpeechRecognition();
+  recognition.lang          = meta.speechLang;   // hi-IN, kn-IN, or en-US
+  recognition.continuous    = false;
+  recognition.interimResults= true;
+  recognition.maxAlternatives = 1;
+
+  recognition.onstart = () => {
+    isRecording = true;
+    const micBtn = document.getElementById('micBtn');
+    if (micBtn) { micBtn.classList.add('recording'); micBtn.textContent = '🔴'; }
+    const vs = document.getElementById('voiceStatus');
+    const vt = document.getElementById('voiceStatusText');
+    if (vs) vs.classList.add('active');
+    const listeningText = { english: 'Listening… speak now', hindi: 'सुन रहा हूँ… बोलें', kannada: 'ಆಲಿಸುತ್ತಿದ್ದೇನೆ… ಮಾತನಾಡಿ' };
+    if (vt) vt.textContent = listeningText[lang] || listeningText.english;
+  };
+
+  recognition.onresult = (event) => {
+    let transcript = '';
+    for (let i = event.resultIndex; i < event.results.length; i++) {
+      transcript += event.results[i][0].transcript;
+    }
+    const input = document.getElementById('msgInput');
+    if (input) {
+      input.value = transcript;
+      autoResize(input);
+    }
+  };
+
+  recognition.onend = () => {
+    stopRecording();
+    // Auto-send if there's content
+    const input = document.getElementById('msgInput');
+    if (input && input.value.trim()) {
+      setTimeout(() => sendMessage(), 300);
+    }
+  };
+
+  recognition.onerror = (event) => {
+    stopRecording();
+    if (event.error !== 'no-speech') {
+      addMsg('ai', `⚠️ Voice recognition error: ${event.error}. Try again! 🎤`, true);
+    }
+  };
+
+  recognition.start();
+}
+
+function stopRecording() {
+  isRecording = false;
+  if (recognition) {
+    try { recognition.stop(); } catch(e) {}
+    recognition = null;
+  }
+  const micBtn = document.getElementById('micBtn');
+  if (micBtn) { micBtn.classList.remove('recording'); micBtn.textContent = '🎤'; }
+  const vs = document.getElementById('voiceStatus');
+  if (vs) vs.classList.remove('active');
+}
+
+// ── Text-to-Speech (Sarvam AI → Google TTS → Web Speech fallback) ─────────
+
+// Cache browser voices once loaded
+let _voiceCache  = [];
+let _sarvamReady = null;   // null = unchecked, true/false after first check
+
+// Check Sarvam TTS availability once on page load
+async function _checkSarvam() {
+  if (_sarvamReady !== null) return _sarvamReady;
+  try {
+    const r = await fetch('http://localhost:8000/voice/tts/status');
+    const d = await r.json();
+    _sarvamReady = d.sarvam_configured === true;
+    console.log('[TTS] Sarvam AI configured:', _sarvamReady);
+  } catch(e) {
+    _sarvamReady = false;
+  }
+  return _sarvamReady;
+}
+
+// ── Sarvam AI TTS (Primary — real Indian voice) ────────────────────────────
+async function _speakWithSarvam(text, language, btn2) {
+  try {
+    const res = await fetch('http://localhost:8000/voice/tts', {
+      method : 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body   : JSON.stringify({ text: text.slice(0, 500), language })
+    });
+    const data = await res.json();
+
+    if (data.success && data.audio) {
+      // Decode base64 WAV and play it
+      const byteChars = atob(data.audio);
+      const bytes     = new Uint8Array(byteChars.length);
+      for (let i = 0; i < byteChars.length; i++) bytes[i] = byteChars.charCodeAt(i);
+      const blob = new Blob([bytes], { type: 'audio/wav' });
+      const url  = URL.createObjectURL(blob);
+      const audio = new Audio(url);
+      audio.playbackRate = 0.95;
+      if (btn2) btn2.classList.add('speaking');
+      audio.onended = () => {
+        URL.revokeObjectURL(url);
+        if (btn2) btn2.classList.remove('speaking');
+      };
+      audio.onerror = () => {
+        URL.revokeObjectURL(url);
+        if (btn2) btn2.classList.remove('speaking');
+      };
+      await audio.play();
+      console.log(`[TTS] Sarvam AI playing: ${data.speaker} (${language})`);
+      return true;   // success
+    }
+    console.warn('[TTS] Sarvam returned no audio:', data.error);
+    return false;
+  } catch(e) {
+    console.warn('[TTS] Sarvam call failed:', e.message);
+    return false;
+  }
+}
+
+// ── Google Translate TTS (Fallback 1) ─────────────────────────────────────
+function _speakWithGoogleTTS(text, langCode, btn2) {
+  const MAX = 190;
+  const chunks = [];
+  let remaining = text;
+  while (remaining.length > 0) { chunks.push(remaining.slice(0, MAX)); remaining = remaining.slice(MAX); }
+
+  let idx = 0;
+  function playNext() {
+    if (idx >= chunks.length) {
+      if (btn2) btn2.classList.remove('speaking');
+      return;
+    }
+    const chunk = encodeURIComponent(chunks[idx++]);
+    const src   = `https://translate.google.com/translate_tts?ie=UTF-8&tl=${langCode}&client=tw-ob&q=${chunk}`;
+    const audio = new Audio(src);
+    audio.playbackRate = 0.95;
+    audio.onended = playNext;
+    audio.onerror = playNext;
+    audio.play().catch(() => playNext());
+  }
+  if (btn2) btn2.classList.add('speaking');
+  playNext();
+}
+
+// ── Web Speech API voice loader ────────────────────────────────────────────
+function _loadVoices() {
+  return new Promise(resolve => {
+    const v = speechSynthesis.getVoices();
+    if (v.length > 0) { _voiceCache = v; resolve(v); return; }
+    speechSynthesis.addEventListener('voiceschanged', () => {
+      _voiceCache = speechSynthesis.getVoices(); resolve(_voiceCache);
+    }, { once: true });
+    setTimeout(() => resolve(speechSynthesis.getVoices()), 1500);
+  });
+}
+
+function _findBestVoice(voices, langCode) {
+  const lang2 = langCode.split('-')[0].toLowerCase();
+  let v = voices.find(v => v.lang.toLowerCase() === langCode.toLowerCase()); if (v) return v;
+  v = voices.find(v => v.lang.toLowerCase().startsWith(lang2));              if (v) return v;
+  const hints = { hi: ['hindi','devanagari'], kn: ['kannada','kannad'] }[lang2] || [];
+  v = voices.find(v => hints.some(h => v.name.toLowerCase().includes(h)));  if (v) return v;
+  return null;
+}
+
+// ── Main speakText — tries Sarvam → Google TTS → Web Speech ───────────────
+async function speakText(msgId, speechLang) {
+  // Stop any current speech
+  if (window.speechSynthesis) speechSynthesis.cancel();
+
+  const el = document.getElementById(msgId);
+  if (!el) return;
+
+  // Extract clean text
+  const temp   = document.createElement('div');
+  temp.innerHTML = el.innerHTML;
+  ['msg-meta','speak-btn'].forEach(cls => { const e = temp.querySelector('.'+cls); if(e) e.remove(); });
+  const text = temp.textContent.trim();
+  if (!text) return;
+
+  const btn2    = document.getElementById('spk_' + msgId);
+  const isIndian = speechLang === 'hi-IN' || speechLang === 'kn-IN';
+  const lang     = speechLang === 'hi-IN' ? 'hindi' : speechLang === 'kn-IN' ? 'kannada' : 'english';
+
+  // ── Layer 1: Sarvam AI (best quality, real Indian voice) ──────────────
+  if (isIndian) {
+    const sarvamOk = await _checkSarvam();
+    if (sarvamOk) {
+      const played = await _speakWithSarvam(text, lang, btn2);
+      if (played) return;   // success — done
+    }
+  }
+
+  // ── Layer 2: Google Translate TTS (good quality, free) ────────────────
+  if (isIndian) {
+    console.log('[TTS] Using Google Translate TTS fallback');
+    _speakWithGoogleTTS(text, speechLang.split('-')[0], btn2);
+    return;
+  }
+
+  // ── Layer 3: Web Speech API (English or if above failed) ──────────────
+  if (!window.speechSynthesis) { alert('TTS not supported in this browser.'); return; }
+  const voices    = _voiceCache.length ? _voiceCache : await _loadVoices();
+  const bestVoice = _findBestVoice(voices, speechLang);
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang  = speechLang || 'en-US';
+  utterance.rate  = 0.88;
+  if (bestVoice)  { utterance.voice = bestVoice; console.log('[TTS] Web Speech:', bestVoice.name); }
+  utterance.onstart = () => { if (btn2) btn2.classList.add('speaking'); };
+  utterance.onend   = () => { if (btn2) btn2.classList.remove('speaking'); };
+  utterance.onerror = () => { if (btn2) btn2.classList.remove('speaking'); };
+  speechSynthesis.speak(utterance);
+}
+
+// Pre-warm on page load
+if (window.speechSynthesis) {
+  speechSynthesis.addEventListener('voiceschanged', () => {
+    _voiceCache = speechSynthesis.getVoices();
+  });
+  speechSynthesis.getVoices();
+}
+// Check Sarvam status silently on load
+_checkSarvam();
+
 </script>
 </body>
 </html>
+
