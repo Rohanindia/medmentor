@@ -1138,7 +1138,7 @@
 <div id="confirm-modal">
   <div class="modal-box">
     <div class="modal-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
-    <h3>Delete Student?</h3>
+    <h3 id="confirm-title">Delete Student?</h3>
     <p id="confirm-text">This action is <strong>permanent</strong> and cannot be undone. The student's data will be removed from the database.</p>
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeModal()">Cancel</button>
@@ -1243,6 +1243,7 @@
 
   function confirmLogout() {
     pendingDeleteId = '__logout__';
+    document.getElementById('confirm-title').textContent = 'Admin Logout?';
     document.getElementById('confirm-text').innerHTML =
       'Are you sure you want to <strong>sign out</strong> of the admin panel?';
     document.getElementById('confirm-btn').textContent = 'Logout';
@@ -1523,6 +1524,7 @@
   ═══════════════════════════════════════════════════════════════ */
   function promptDelete(id, name) {
     pendingDeleteId = id;
+    document.getElementById('confirm-title').textContent = 'Delete Student?';
     document.getElementById('confirm-text').innerHTML =
       `You are about to <strong>permanently delete</strong> the student <strong>${escHtml(name)}</strong>.<br>This cannot be undone.`;
     document.getElementById('confirm-btn').textContent = 'Delete';
